@@ -1,21 +1,69 @@
-# Module
+package JEDictionary;
 
-my %kanji_kana_dict;
-my %kana_english_dict;
+use DOM::Tiny;
+use Moo;
+use XML::LibXML::Reader;
+
+has [qw/kana_english_dict kanji_kana_dict/] => ( is => 'rw' );
+
+has xml_file => ( is => 'ro', required => 1 );
 
 sub build_dictionary {
-    
+    my $self = shift;
+
+    my $reader = XML::LibXML::Reader->new(
+        encoding => 'utf8',
+        location => $self->xml_file,
+    ) or die $!;
+
+    while ( $reader->read ) {
+        $reader->nextElement('entry');
+        $self->add_to_dictionary( $reader->readInnerXml );
+    }
 }
 
-sub add_to_dictionary_trees {
-    # Given a 'sentence' from the dictionary file
-    # parse it
-    # add to relevant dicts
+sub add_to_dictionary {
+    # Dictionary actually consists of two data structures,
+    # one for kanji,
+    # one for katakana.
 
+    my ( $self, $xml ) = @_;
+
+    my $dom = DOM::Tiny->new($xml);
+
+    my $kanji_elems = $dom->find('keb');
+
+    my $kana_elems = $dom->find('reb');
+
+    # Arrayref containing only the text of each gloss element
+    my $gloss_texts = [ map $_->text, @{ $dom->find('gloss') } ];
+
+    for my $kana (@$kana_elems) {
+        # Add to the kana dictionary.
+        # Each entry is an arrayref of arrayrefs,
+        # that each contain the glosses for a particular kanji reading
+        # (as a kana reading may map to multiple kanji readings,
+        # e.g. 地震 and 自信 both map to じしん).
+        # The index of each new arrayref is used in the kanji dictionary
+        # below.
+        push @{ $self->kana_dict->{ $kana->text } }, $gloss_texts;
+
+        my $gloss_index = @{ $self->kana_dict->{ $kana->text } } - 1;
+
+        # Now add to the kanji dictionary
+        for my $kanji (@$kanji_elems) {
+            # Each entry is a hashref mapping a kana reading to its gloss
+            # index.
+            # So e.g. if you were to look up 地震 in the kanji dictionary,
+            # you would get a kana reading of じしん and an index of X;
+            # the kana and index can be used to look up the correct English
+            # gloss(es) in the kana dictionary (e.g. 'earthquake' as opposed
+            # to 'confidence').
+            # A kanji entry may have more than one kana reading.
+            $self->kanji_dict->{ $kanji->text }->{ $kana->text }
+                = $gloss_index;
+        }
+    }
 }
 
-sub parse_entry {
-    # Need magical regex
-
-    return ( $kanji, $kana, $english );
-}
+1;
