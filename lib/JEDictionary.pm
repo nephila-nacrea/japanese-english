@@ -1,10 +1,13 @@
 package JEDictionary;
 
+use strict;
+use warnings;
+
 use DOM::Tiny;
 use Moo;
 use XML::LibXML::Reader;
 
-has [qw/kana_english_dict kanji_kana_dict/] => ( is => 'rw' );
+has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
 
 has xml_file => ( is => 'ro', required => 1 );
 
@@ -23,36 +26,37 @@ sub build_dictionary {
 }
 
 sub add_to_dictionary {
-    # Dictionary actually consists of two data structures,
-    # one for kanji,
-    # one for katakana.
-
     my ( $self, $xml ) = @_;
 
     my $dom = DOM::Tiny->new($xml);
 
+    # An entry should always have at least one kana reading ('reb'
+    # element) and one English definition ('gloss' element), so skip
+    # if either one is absent.
+    # 'keb' = kanji reading
+    my $kana_elems;
+    return unless $kana_elems = $dom->find('reb');
+
+    my @gloss_texts;
+    return unless @gloss_texts = map $_->text, @{ $dom->find('gloss') };
+
     my $kanji_elems = $dom->find('keb');
 
-    my $kana_elems = $dom->find('reb');
-
-    # Arrayref containing only the text of each gloss element
-    my $gloss_texts = [ map $_->text, @{ $dom->find('gloss') } ];
-
     for my $kana (@$kana_elems) {
-        # Add to the kana dictionary.
-        # Each entry is an arrayref of arrayrefs,
+        # Add to the kana_dict hashref.
+        # Each value is an arrayref of arrayrefs,
         # that each contain the glosses for a particular kanji reading
         # (as a kana reading may map to multiple kanji readings,
         # e.g. 地震 and 自信 both map to じしん).
         # The index of each new arrayref is used in the kanji dictionary
         # below.
-        push @{ $self->kana_dict->{ $kana->text } }, $gloss_texts;
+        push @{ $self->kana_dict->{ $kana->text } }, \@gloss_texts;
 
         my $gloss_index = @{ $self->kana_dict->{ $kana->text } } - 1;
 
-        # Now add to the kanji dictionary
         for my $kanji (@$kanji_elems) {
-            # Each entry is a hashref mapping a kana reading to its gloss
+            # Add to the kanji_dict hashref.
+            # Each value is a hashref mapping a kana reading to its gloss
             # index.
             # So e.g. if you were to look up 地震 in the kanji dictionary,
             # you would get a kana reading of じしん and an index of X;
