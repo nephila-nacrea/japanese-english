@@ -8,7 +8,7 @@ use Test::More;
 
 my $jed = new_dict();
 
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     </entry>'
 );
@@ -19,7 +19,7 @@ is_deeply $jed->kanji_dict, {}, 'Add empty entry to kanji_dict';
 $jed = new_dict();
 
 # No keb
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     <ent_seq>1468820</ent_seq>
     <r_ele>
@@ -40,7 +40,7 @@ is_deeply $jed->kanji_dict, {}, 'Add entry with no kanji: kanji_dict';
 $jed = new_dict();
 
 # No reb
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     <ent_seq>1468820</ent_seq>
     <k_ele>
@@ -60,7 +60,7 @@ is_deeply $jed->kanji_dict, {}, 'Add entry with no kana: kanji_dict';
 $jed = new_dict();
 
 # No gloss
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     <ent_seq>1468820</ent_seq>
     <k_ele>
@@ -82,7 +82,7 @@ is_deeply $jed->kanji_dict, {}, 'Add entry with no gloss: kanji_dict';
 $jed = new_dict();
 
 # One of each
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     <ent_seq>1468820</ent_seq>
     <k_ele>
@@ -107,7 +107,7 @@ is_deeply $jed->kanji_dict, { '年取る' => { 'としとる' => 0 } },
 $jed = new_dict();
 
 # Two of each
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     <ent_seq>1468820</ent_seq>
     <k_ele>
@@ -147,7 +147,7 @@ is_deeply $jed->kanji_dict,
 $jed = new_dict();
 
 # Different kanji with same kana reading
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     <ent_seq>1468820</ent_seq>
     <k_ele>
@@ -161,7 +161,7 @@ $jed->add_to_dictionary(
     </sense>
     </entry>'
 );
-$jed->add_to_dictionary(
+$jed->_add_to_dictionary(
     '<entry>
     <ent_seq>1468820</ent_seq>
     <k_ele>
@@ -186,9 +186,10 @@ is_deeply $jed->kanji_dict,
     },
     'Kanji with same kana reading: kanji_dict';
 
+# TODO Test build_dictionary_from_xml?
+
 sub new_dict {
-    return JEDictionary->new(
-        xml_file => '/home/vmihell-hale/dictionaries/JMdict_e' );
+    return JEDictionary->new( xml_file => 'dummy' );
 }
 
 done_testing;

@@ -11,7 +11,7 @@ has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
 
 has xml_file => ( is => 'ro', required => 1 );
 
-sub build_dictionary {
+sub build_dictionary_from_xml {
     my $self = shift;
 
     my $reader = XML::LibXML::Reader->new(
@@ -21,11 +21,29 @@ sub build_dictionary {
 
     while ( $reader->read ) {
         $reader->nextElement('entry');
-        $self->add_to_dictionary( $reader->readInnerXml );
+        $self->_add_to_dictionary( $reader->readInnerXml );
     }
 }
 
-sub add_to_dictionary {
+# Dumps contents of kana_dict and kanji_dict to files
+sub dump_perl_to_files {
+    my ( $self, $kana_filename, $kanji_filename ) = @_;
+    use Data::Dumper;
+    $Data::Dumper::Indent = 0;
+    open my $fh, '>', $kana_filename or die $!;
+
+    print $fh Dumper $self->kana_dict;
+
+    close $fh;
+
+    open $fh, '>', $kanji_filename or die $!;
+
+    print $fh Dumper $self->kanji_dict;
+
+    close $fh;
+}
+
+sub _add_to_dictionary {
     my ( $self, $xml ) = @_;
 
     my $dom = DOM::Tiny->new($xml);
