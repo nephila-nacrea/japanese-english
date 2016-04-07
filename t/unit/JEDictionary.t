@@ -186,10 +186,18 @@ is_deeply $jed->kanji_dict,
     },
     'Kanji with same kana reading: kanji_dict';
 
-# TODO Test build_dictionary_from_xml?
+$jed = new_dict();
+
+$jed->build_dictionary_from_xml;
+
+is_deeply $jed->kana_dict, {}, 'build_dictionary_from_xml: kana_dict correct';
+
+is_deeply $jed->kanji_dict,
+    {}, 'build_dictionary_from_xml: kanji_dict correct';
 
 sub new_dict {
-    return JEDictionary->new( xml_file => 'dummy' );
+    return JEDictionary->new( xml_file =>
+            '/home/vmihell-hale/nephila_nacrea/t/unit/data/test-dict.xml' );
 }
 
 done_testing;
