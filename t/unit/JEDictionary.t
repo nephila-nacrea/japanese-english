@@ -1,10 +1,13 @@
 use lib '/home/vmihell-hale/nephila_nacrea/lib';
 
 use strict;
+use utf8;
 use warnings;
 
 use JEDictionary;
 use Test::More;
+
+# binmode STDOUT, ":utf8";
 
 my $jed = new_dict();
 
@@ -190,8 +193,16 @@ $jed = new_dict();
 
 $jed->build_dictionary_from_xml;
 
-is_deeply $jed->kana_dict, {
-
+is_deeply $jed->kana_dict,
+    {
+    'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
+    'じしん' =>
+        [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'], ],
+    'ない'                               => [ ['earthquake'] ],
+    'なえ'                               => [ ['earthquake'] ],
+    'じぶるい'                         => [ ['earthquake'] ],
+    'スチューデントアパシー'    => [ ['student apathy'] ],
+    'スチューデント・アパシー' => [ ['student apathy'] ],
     },
     'build_dictionary_from_xml: kana_dict correct';
 
