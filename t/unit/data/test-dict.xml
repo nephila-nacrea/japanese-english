@@ -1,3 +1,9 @@
+<!DOCTYPE test_dict [
+<!ENTITY n "noun (common) (futsuumeishi)">
+<!ENTITY vs "noun or participle which takes the aux. verb suru">
+<!ENTITY ok "out-dated or obsolete kana usage">
+]>
+<test_dict>
 <entry>
 <ent_seq>1796130</ent_seq>
 <k_ele>
@@ -80,3 +86,4 @@
 <gloss>student apathy</gloss>
 </sense>
 </entry>
+</test_dict>

@@ -177,7 +177,7 @@ $jed->_add_to_dictionary(
 );
 
 is_deeply $jed->kana_dict,
-    { 'じしん' => [ ['confidence'], ['earthquake'], ], },
+    { 'じしん' => [ ['confidence'], ['earthquake'] ] },
     'Kanji with same kana reading: kana_dict';
 is_deeply $jed->kanji_dict,
     {
@@ -190,10 +190,24 @@ $jed = new_dict();
 
 $jed->build_dictionary_from_xml;
 
-is_deeply $jed->kana_dict, {}, 'build_dictionary_from_xml: kana_dict correct';
+is_deeply $jed->kana_dict, {
+
+    },
+    'build_dictionary_from_xml: kana_dict correct';
 
 is_deeply $jed->kanji_dict,
-    {}, 'build_dictionary_from_xml: kanji_dict correct';
+    {
+    '鳥打ち' => { 'とりうち' => 0 },
+    '鳥撃ち' => { 'とりうち' => 0 },
+    '自信'    => { 'じしん'    => 0 },
+    '地震'    => {
+        'じしん'    => 1,
+        'ない'       => 0,
+        'なえ'       => 0,
+        'じぶるい' => 0,
+    },
+    },
+    'build_dictionary_from_xml: kanji_dict correct';
 
 sub new_dict {
     return JEDictionary->new( xml_file =>
