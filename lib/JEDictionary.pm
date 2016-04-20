@@ -3,6 +3,7 @@ package JEDictionary;
 use strict;
 use warnings;
 
+use Data::Dumper;
 use DOM::Tiny;
 use Moo;
 use XML::LibXML::Reader;
@@ -28,8 +29,9 @@ sub build_dictionary_from_xml {
 # Dumps contents of kana_dict and kanji_dict to files
 sub dump_perl_to_files {
     my ( $self, $kana_filename, $kanji_filename ) = @_;
-    use Data::Dumper;
+
     $Data::Dumper::Indent = 0;
+
     open my $fh, '>', $kana_filename or die $!;
 
     print $fh Dumper $self->kana_dict;
@@ -41,6 +43,32 @@ sub dump_perl_to_files {
     print $fh Dumper $self->kanji_dict;
 
     close $fh;
+}
+
+sub get_english_definitions {
+    my ($self, @jp_words) = @_;
+
+    my %gloss_hash;
+
+    for my $word (@jp_words) {
+        # Look in kanji dictionary first.
+        # $kana_href is of the form { <kana_reading> => <gloss_index> }
+        my $kana_href = $self->kanji_dict->{$word}; 
+
+        my $gloss_index;
+        if ( $kana_href ) {
+            $gloss_hash{$word}->{kana} = keys %$kana_href;
+
+            # There may be several kana readings for a kanji,
+            # but the gloss(es) should be the same for each.
+            # So we only need to get the gloss(es) for one kana entry.
+            $gloss_index = (values %$kana_href)[0]; 
+        }
+        # The word may be written in kana alone;
+        # if no kanji result, look in kana dictionary
+
+        # Otherwise, the word cannot be found
+    }
 }
 
 sub _add_to_dictionary {

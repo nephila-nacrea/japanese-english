@@ -7,7 +7,9 @@ use warnings;
 use JEDictionary;
 use Test::More;
 
-# binmode STDOUT, ":utf8";
+#
+# Test _add_to_dictionary
+#
 
 my $jed = new_dict();
 
@@ -189,6 +191,9 @@ is_deeply $jed->kanji_dict,
     },
     'Kanji with same kana reading: kanji_dict';
 
+#
+# Test build_dictionary_from_xml
+#
 $jed = new_dict();
 
 $jed->build_dictionary_from_xml;
@@ -219,6 +224,54 @@ is_deeply $jed->kanji_dict,
     },
     },
     'build_dictionary_from_xml: kanji_dict correct';
+
+#
+# Test get_english_definitions
+#
+$jed = new_dict();
+
+$jed->build_dictionary_from_xml;
+
+is_deeply $jed->get_english_definitions('鳥打ち'),
+    {
+    '鳥打ち' => {
+        kana    => ['とりうち'],
+        glosses => [ [ 'fowling', 'shooting birds' ] ]
+    }
+    },
+    'get_english_definitions: kanji word';
+
+is_deeply $jed->get_english_definitions('とりうち'),
+    { 'とりうち' => { glosses => [ [ 'fowling', 'shooting birds' ] ] } },
+    'get_english_definitions: kana word';
+
+is_deeply $jed->get_english_definitions('じしん'),
+    {
+    'じしん' => {
+        glosses => [
+            [ 'self-confidence', 'confidence (in oneself)' ],
+            ['earthquake'],
+        ]
+    }
+    },
+    'get_english_definitions: kana word with multiple gloss-groups';
+
+is_deeply $jed->get_english_definitions('とりうちじしん'),
+    { 'とりうちじしん' => {} },
+    'get_english_definitions: no match found';
+
+is_deeply $jed->get_english_definitions( 'とりうち', '自信',
+    'スチューデントアパシー' ),
+    {
+    'とりうち' => { glosses => [ [ 'fowling', 'shooting birds' ] ] },
+    '地震' => {
+        kana => [ 'じしん', 'ない', 'なえ', 'じぶるい' ],
+        glosses => [ ['earthquake'] ]
+    },
+    'スチューデントアパシー' =>
+        { glosses => [ ['student apathy'] ] },
+    },
+    'get_english_definitions: multiple inputs';
 
 sub new_dict {
     return JEDictionary->new( xml_file =>
