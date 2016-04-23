@@ -5,6 +5,7 @@ use utf8;
 use warnings;
 
 use JEDictionary;
+use Test::Deep;
 use Test::More;
 
 #
@@ -232,7 +233,7 @@ $jed = new_dict();
 
 $jed->build_dictionary_from_xml;
 
-is_deeply $jed->get_english_definitions('鳥打ち'),
+is_deeply { $jed->get_english_definitions('鳥打ち') },
     {
     '鳥打ち' => {
         kana    => ['とりうち'],
@@ -241,11 +242,11 @@ is_deeply $jed->get_english_definitions('鳥打ち'),
     },
     'get_english_definitions: kanji word';
 
-is_deeply $jed->get_english_definitions('とりうち'),
+is_deeply { $jed->get_english_definitions('とりうち') },
     { 'とりうち' => { glosses => [ [ 'fowling', 'shooting birds' ] ] } },
     'get_english_definitions: kana word';
 
-is_deeply $jed->get_english_definitions('じしん'),
+is_deeply { $jed->get_english_definitions('じしん') },
     {
     'じしん' => {
         glosses => [
@@ -256,16 +257,18 @@ is_deeply $jed->get_english_definitions('じしん'),
     },
     'get_english_definitions: kana word with multiple gloss-groups';
 
-is_deeply $jed->get_english_definitions('とりうちじしん'),
+is_deeply { $jed->get_english_definitions('とりうちじしん') },
     { 'とりうちじしん' => {} },
     'get_english_definitions: no match found';
 
-is_deeply $jed->get_english_definitions( 'とりうち', '自信',
-    'スチューデントアパシー' ),
+cmp_deeply {
+    $jed->get_english_definitions( 'とりうち', '地震',
+        'スチューデントアパシー' )
+},
     {
     'とりうち' => { glosses => [ [ 'fowling', 'shooting birds' ] ] },
     '地震' => {
-        kana => [ 'じしん', 'ない', 'なえ', 'じぶるい' ],
+        kana => bag( 'じしん', 'ない', 'なえ', 'じぶるい' ),
         glosses => [ ['earthquake'] ]
     },
     'スチューデントアパシー' =>
