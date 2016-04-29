@@ -10,7 +10,8 @@ use XML::LibXML::Reader;
 
 has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
 
-has xml_file => ( is => 'ro', required => 1 );
+# TODO Might not need this
+has xml_file => ( is => 'ro' );
 
 sub build_dictionary_from_xml {
     my $self = shift;
@@ -26,6 +27,15 @@ sub build_dictionary_from_xml {
     }
 }
 
+# Builds dictionary from perl data structures that have been dumped into
+# files
+sub build_dictionary_from_perl {
+    my ( $self, $kana_filename, $kanji_filename ) = @_;
+
+    $self->kana_dict( do $kana_filename );
+    $self->kanji_dict( do $kanji_filename );
+}
+
 # Dumps contents of kana_dict and kanji_dict to files
 sub dump_perl_to_files {
     my ( $self, $kana_filename, $kanji_filename ) = @_;
@@ -33,15 +43,11 @@ sub dump_perl_to_files {
     $Data::Dumper::Indent = 0;
 
     open my $fh, '>', $kana_filename or die $!;
-
     print $fh Dumper $self->kana_dict;
-
     close $fh;
 
     open $fh, '>', $kanji_filename or die $!;
-
     print $fh Dumper $self->kanji_dict;
-
     close $fh;
 }
 
@@ -80,6 +86,44 @@ sub get_english_definitions {
     }
 
     return %gloss_hash;
+}
+
+# Pretty-prints list of Japanese words with English glosses to a file.
+# See get_english_definitions above for more detail on contents of
+# %gloss_hash.
+#
+# Each line is of the form:
+# <kanji>    <kana>[, <kana>...]    <English>[,<English>...]
+# or
+# <kana>    <English>[,<English>...]
+# or
+# <kanji/kana>    NO ENTRY FOUND
+sub pretty_print_to_file {
+    my ( $self, $filename, %gloss_hash ) = @_;
+
+    open my $fh, '>', $filename or die $!;
+
+    for my $key ( keys %gloss_hash ) {
+        print $fh $key . '    ';
+
+        # Kanji will have kana entry as well as English gloss(es)
+        if ( exists $gloss_hash{$key}->{kana} ) {
+            print $fh ( join ', ', @{ $gloss_hash{$key}->{kana} } ) . '    ';
+        }
+
+        if ( exists $gloss_hash{$key}->{glosses} ) {
+            my @glosses = map @$_, @{ $gloss_hash{$key}->{glosses} };
+
+            print $fh ( join ', ', @glosses ) . '    ';
+        }
+        else {
+            print $fh, 'NO ENTRY FOUND';
+        }
+
+        print $fh, "\n";
+    }
+
+    close $fh;
 }
 
 sub _add_to_dictionary {
