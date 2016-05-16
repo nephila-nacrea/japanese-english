@@ -57,33 +57,47 @@ sub get_english_definitions {
     my %gloss_hash;
 
     for my $word (@jp_words) {
+        # Look in kanji dictionary first.
+        # $kana_href is of the form
+        # { <kana_reading> => <gloss_index>, ... }
         if ( my $kana_href = $self->kanji_dict->{$word} ) {
-            # Look in kanji dictionary first.
-            # $kana_href is of the form
-            # { <kana_reading> => <gloss_index> }
-            $gloss_hash{$word}->{kana} = [ keys %$kana_href ];
+            # There may be several kana readings for a kanji, which
+            # may or may not share the same glosses.
+            # Just get the glosses for each one, though there may be
+            # repetition.
+            for my $kana ( keys %$kana_href ) {
+                my $gloss_index = $kana_href->{$kana};
 
-            # There may be several kana readings for a kanji,
-            # but the gloss(es) should be the same for each.
-            # So we only need to get the gloss(es) for one kana entry.
-            my $kana        = ( keys %$kana_href )[0];
-            my $gloss_index = $kana_href->{$kana};
-
-            # Get gloss(es) from kana dictionary
-            push @{ $gloss_hash{$word}->{glosses} },
-                @{ $self->kana_dict->{$kana} }[$gloss_index];
+                # Find gloss(es) in kana dictionary
+                $gloss_hash{$word}->{$kana}
+                    = $self->kana_dict->{$kana}->[$gloss_index];
+            }
         }
         elsif ( my $glosses = $self->kana_dict->{$word} ) {
             # Word not found in kanji dictionary;
             # is written in kana alone.
             # So just get all glosses for that kana entry.
-            $gloss_hash{$word}->{glosses} = $glosses;
+            $gloss_hash{$word} = $glosses;
         }
         else {
             # The word cannot be found
             $gloss_hash{$word} = {};
         }
     }
+
+    # Gloss hash will be of form
+    # {
+    #   <kanji> => {
+    #       <kana_1> => [<glosses>], ...,
+    #   },
+    #   ...,
+    #   <kana> => [
+    #       [<glosses_1], ...,
+    #   ],
+    #   ...,
+    #   <word that cannot be found> => {},
+    #   ...,
+    # }
 
     return %gloss_hash;
 }
@@ -117,10 +131,10 @@ sub pretty_print_to_file {
             print $fh ( join ', ', @glosses ) . '    ';
         }
         else {
-            print $fh, 'NO ENTRY FOUND';
+            print $fh 'NO ENTRY FOUND';
         }
 
-        print $fh, "\n";
+        print $fh "\n";
     }
 
     close $fh;

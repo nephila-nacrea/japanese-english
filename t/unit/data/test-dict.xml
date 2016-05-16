@@ -1,7 +1,14 @@
 <!DOCTYPE test_dict [
+<!ENTITY abbr "abbreviation">
+<!ENTITY ctr "counter">
 <!ENTITY n "noun (common) (futsuumeishi)">
-<!ENTITY vs "noun or participle which takes the aux. verb suru">
+<!ENTITY n-adv "adverbial noun (fukushitekimeishi)">
+<!ENTITY n-pref "noun, used as a prefix">
+<!ENTITY n-suf "noun, used as a suffix">
+<!ENTITY n-t "noun (temporal) (jisoumeishi)">
 <!ENTITY ok "out-dated or obsolete kana usage">
+<!ENTITY suf "suffix">
+<!ENTITY vs "noun or participle which takes the aux. verb suru">
 ]>
 <test_dict>
 <entry>
@@ -84,6 +91,93 @@
 <sense>
 <pos>&n;</pos>
 <gloss>student apathy</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>1463770</ent_seq>
+<k_ele>
+<keb>日</keb>
+<ke_pri>ichi1</ke_pri>
+<ke_pri>news1</ke_pri>
+<ke_pri>nf03</ke_pri>
+</k_ele>
+<k_ele>
+<keb>陽</keb>
+</k_ele>
+<r_ele>
+<reb>ひ</reb>
+<re_pri>ichi1</re_pri>
+<re_pri>news1</re_pri>
+<re_pri>nf03</re_pri>
+</r_ele>
+<sense>
+<stagk>日</stagk>
+<pos>&n-adv;</pos>
+<pos>&n-t;</pos>
+<gloss>day</gloss>
+<gloss>days</gloss>
+</sense>
+<sense>
+<gloss>sun</gloss>
+<gloss>sunshine</gloss>
+<gloss>sunlight</gloss>
+</sense>
+<sense>
+<stagk>日</stagk>
+<s_inf>as 〜した日には, 〜と来た日には, etc.</s_inf>
+<gloss>case (esp. unfortunate)</gloss>
+<gloss>event</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>2083100</ent_seq>
+<k_ele>
+<keb>日</keb>
+</k_ele>
+<r_ele>
+<reb>にち</reb>
+</r_ele>
+<sense>
+<pos>&n;</pos>
+<xref>日曜</xref>
+<misc>&abbr;</misc>
+<gloss>Sunday</gloss>
+</sense>
+<sense>
+<pos>&suf;</pos>
+<s_inf>also んち or ち</s_inf>
+<gloss>day (of the month)</gloss>
+</sense>
+<sense>
+<pos>&suf;</pos>
+<pos>&ctr;</pos>
+<s_inf>also んち or ち</s_inf>
+<gloss>counter for days</gloss>
+</sense>
+<sense>
+<pos>&n;</pos>
+<pos>&n-suf;</pos>
+<pos>&n-pref;</pos>
+<xref>日本</xref>
+<misc>&abbr;</misc>
+<gloss>Japan</gloss>
+</sense>
+</entry>
+<entry>
+<ent_seq>2083110</ent_seq>
+<k_ele>
+<keb>日</keb>
+</k_ele>
+<r_ele>
+<reb>か</reb>
+</r_ele>
+<sense>
+<pos>&n-suf;</pos>
+<gloss>day of month</gloss>
+</sense>
+<sense>
+<pos>&ctr;</pos>
+<gloss>counter for days</gloss>
 </sense>
 </entry>
 </test_dict>

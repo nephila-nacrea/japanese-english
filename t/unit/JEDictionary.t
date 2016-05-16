@@ -192,21 +192,124 @@ is_deeply $jed->kanji_dict,
     },
     'Kanji with same kana reading: kanji_dict';
 
+# Identical kanji, different entries
+$jed = new_dict();
+
+$jed->_add_to_dictionary(
+    '<entry>
+    <ent_seq>1463770</ent_seq>
+    <k_ele>
+    <keb>日</keb>
+    </k_ele>
+    <k_ele>
+    <keb>陽</keb>
+    </k_ele>
+    <r_ele>
+    <reb>ひ</reb>
+    </r_ele>
+    <sense>
+    <gloss>day</gloss>
+    <gloss>days</gloss>
+    </sense>
+    <sense>
+    <gloss>sun</gloss>
+    <gloss>sunshine</gloss>
+    <gloss>sunlight</gloss>
+    </sense>
+    <sense>
+    <gloss>case (esp. unfortunate)</gloss>
+    <gloss>event</gloss>
+    </sense>
+    </entry>'
+);
+$jed->_add_to_dictionary(
+    '<entry>
+    <ent_seq>2083100</ent_seq>
+    <k_ele>
+    <keb>日</keb>
+    </k_ele>
+    <r_ele>
+    <reb>にち</reb>
+    </r_ele>
+    <sense>
+    <gloss>Sunday</gloss>
+    </sense>
+    <sense>
+    <gloss>day (of the month)</gloss>
+    </sense>
+    <sense>
+    <gloss>counter for days</gloss>
+    </sense>
+    <sense>
+    <gloss>Japan</gloss>
+    </sense>
+    </entry>'
+);
+$jed->_add_to_dictionary(
+    '<entry>
+    <ent_seq>2083110</ent_seq>
+    <k_ele>
+    <keb>日</keb>
+    </k_ele>
+    <r_ele>
+    <reb>か</reb>
+    </r_ele>
+    <sense>
+    <gloss>day of month</gloss>
+    </sense>
+    <sense>
+    <gloss>counter for days</gloss>
+    </sense>
+    </entry>'
+);
+
+cmp_deeply $jed->kana_dict,
+    {
+    'か' => [ [ 'day of month', 'counter for days' ] ],
+    'にち' =>
+        [ [ 'Sunday', 'day (of the month)', 'counter for days', 'Japan' ] ],
+    'ひ' => [
+        [   'day', 'days', 'sun', 'sunshine', 'sunlight',
+            'case (esp. unfortunate)', 'event',
+        ]
+    ],
+    },
+    'Identical kanji with different readings: kana_dict';
+is_deeply $jed->kanji_dict,
+    {
+    '日' => {
+        'か'    => 0,
+        'ひ'    => 0,
+        'にち' => 0,
+    },
+    '陽' => { 'ひ' => 0 },
+    },
+    'Identical kanji with different readings: kanji_dict';
+
 #
 # Test build_dictionary_from_xml
 #
-$jed = new_dict();
+$jed = new_dict( xml_file =>
+        '/home/vmihell-hale/nephila_nacrea/t/unit/data/test-dict.xml' );
 
 $jed->build_dictionary_from_xml;
 
 is_deeply $jed->kana_dict,
     {
-    'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
+    'か' => [ [ 'day of month', 'counter for days' ] ],
     'じしん' =>
         [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'], ],
-    'ない'                               => [ ['earthquake'] ],
-    'なえ'                               => [ ['earthquake'] ],
-    'じぶるい'                         => [ ['earthquake'] ],
+    'じぶるい' => [ ['earthquake'] ],
+    'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
+    'ない'       => [ ['earthquake'] ],
+    'なえ'       => [ ['earthquake'] ],
+    'にち' =>
+        [ [ 'Sunday', 'day (of the month)', 'counter for days', 'Japan' ] ],
+    'ひ' => [
+        [   'day', 'days', 'sun', 'sunshine', 'sunlight',
+            'case (esp. unfortunate)', 'event',
+        ]
+    ],
     'スチューデントアパシー'    => [ ['student apathy'] ],
     'スチューデント・アパシー' => [ ['student apathy'] ],
     },
@@ -214,48 +317,55 @@ is_deeply $jed->kana_dict,
 
 is_deeply $jed->kanji_dict,
     {
-    '鳥打ち' => { 'とりうち' => 0 },
-    '鳥撃ち' => { 'とりうち' => 0 },
-    '自信'    => { 'じしん'    => 0 },
-    '地震'    => {
+    '地震' => {
         'じしん'    => 1,
         'ない'       => 0,
         'なえ'       => 0,
         'じぶるい' => 0,
     },
+    '日'       => { 'か'          => 0, 'ひ' => 0, 'にち' => 0 },
+    '自信'    => { 'じしん'    => 0 },
+    '陽'       => { 'ひ'          => 0 },
+    '鳥打ち' => { 'とりうち' => 0 },
+    '鳥撃ち' => { 'とりうち' => 0 },
     },
     'build_dictionary_from_xml: kanji_dict correct';
 
 #
 # Test get_english_definitions
 #
-$jed = new_dict();
+$jed = new_dict( xml_file =>
+        '/home/vmihell-hale/nephila_nacrea/t/unit/data/test-dict.xml' );
 
 $jed->build_dictionary_from_xml;
 
 is_deeply { $jed->get_english_definitions('鳥打ち') },
-    {
-    '鳥打ち' => {
-        kana    => ['とりうち'],
-        glosses => [ [ 'fowling', 'shooting birds' ] ]
-    }
-    },
+    { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
     'get_english_definitions: kanji word';
 
 is_deeply { $jed->get_english_definitions('とりうち') },
-    { 'とりうち' => { glosses => [ [ 'fowling', 'shooting birds' ] ] } },
+    { 'とりうち' => [ [ 'fowling', 'shooting birds' ] ] },
     'get_english_definitions: kana word';
 
 is_deeply { $jed->get_english_definitions('じしん') },
-    {
-    'じしん' => {
-        glosses => [
-            [ 'self-confidence', 'confidence (in oneself)' ],
-            ['earthquake'],
-        ]
-    }
+    { 'じしん' =>
+        [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
     },
     'get_english_definitions: kana word with multiple gloss-groups';
+
+is_deeply { $jed->get_english_definitions('日') },
+    {
+    '日' => {
+        'か' => [ 'day of month', 'counter for days' ],
+        'にち' =>
+            [ 'Sunday', 'day (of the month)', 'counter for days', 'Japan' ],
+        'ひ' => [
+            'day', 'days', 'sun', 'sunshine', 'sunlight',
+            'case (esp. unfortunate)', 'event',
+        ],
+    },
+    },
+    'get_english_definitions: kanji word with multiple readings';
 
 is_deeply { $jed->get_english_definitions('とりうちじしん') },
     { 'とりうちじしん' => {} },
@@ -266,19 +376,19 @@ cmp_deeply {
         'スチューデントアパシー' )
 },
     {
-    'とりうち' => { glosses => [ [ 'fowling', 'shooting birds' ] ] },
+    'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
     '地震' => {
-        kana => bag( 'じしん', 'ない', 'なえ', 'じぶるい' ),
-        glosses => [ ['earthquake'] ]
+        'じしん'    => ['earthquake'],
+        'じぶるい' => ['earthquake'],
+        'ない'       => ['earthquake'],
+        'なえ'       => ['earthquake'],
     },
-    'スチューデントアパシー' =>
-        { glosses => [ ['student apathy'] ] },
+    'スチューデントアパシー' => [ ['student apathy'] ],
     },
     'get_english_definitions: multiple inputs';
 
 sub new_dict {
-    return JEDictionary->new( xml_file =>
-            '/home/vmihell-hale/nephila_nacrea/t/unit/data/test-dict.xml' );
+    return JEDictionary->new(@_);
 }
 
 done_testing;
