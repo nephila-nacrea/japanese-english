@@ -368,7 +368,7 @@ is_deeply { $jed->get_english_definitions('日') },
     'get_english_definitions: kanji word with multiple readings';
 
 is_deeply { $jed->get_english_definitions('とりうちじしん') },
-    { 'とりうちじしん' => {} },
+    { 'とりうちじしん' => undef },
     'get_english_definitions: no match found';
 
 cmp_deeply {

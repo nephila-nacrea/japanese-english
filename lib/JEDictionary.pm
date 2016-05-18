@@ -81,7 +81,7 @@ sub get_english_definitions {
         }
         else {
             # The word cannot be found
-            $gloss_hash{$word} = {};
+            $gloss_hash{$word} = undef;
         }
     }
 
@@ -106,8 +106,10 @@ sub get_english_definitions {
 # See get_english_definitions above for more detail on contents of
 # %gloss_hash.
 #
-# Each line is of the form:
-# <kanji>    <kana>[, <kana>...]    <English>[,<English>...]
+# Each entry is printed in the following way:
+# <kanji>    <kana>    <English>
+#            [<kana>    <English>]
+#            [...]
 # or
 # <kana>    <English>[,<English>...]
 # or
@@ -120,13 +122,26 @@ sub pretty_print_to_file {
     for my $key ( keys %gloss_hash ) {
         print $fh $key . '    ';
 
-        # Kanji will have kana entry as well as English gloss(es)
-        if ( exists $gloss_hash{$key}->{kana} ) {
-            print $fh ( join ', ', @{ $gloss_hash{$key}->{kana} } ) . '    ';
-        }
+        if ( ref $gloss_hash{$key} eq 'HASH' ) {
+            # Kanji entry is hashref:
+            #   <kanji> => {
+            #       <kana_1> => [<glosses>], ...,
+            #   }
+            my %kana_hash = %{ $gloss_hash{$key} };
 
-        if ( exists $gloss_hash{$key}->{glosses} ) {
-            my @glosses = map @$_, @{ $gloss_hash{$key}->{glosses} };
+            for my $kana ( keys %kana_hash ) {
+                print $fh $kana . '    ';
+
+                print $fh ( join ', ', @{ $kana_hash{$kana} } );
+                print $fh "\n";
+            }
+        }
+        elsif ( ref $gloss_hash{$key} eq 'ARRAY' ) {
+            # Kana entry is arrayref of arrayrefs:
+            #   <kana> => [
+            #       [<glosses_1], ...,
+            #   ],
+            my @glosses = map @$_, @{ $gloss_hash{$key} };
 
             print $fh ( join ', ', @glosses ) . '    ';
         }
