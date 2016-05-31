@@ -61,5 +61,5 @@ my @words = qw/脚本
 
 my %gloss_hash = $jed->get_english_definitions(@words);
 
-$jed->pretty_print_to_file( '/home/vmihell-hale/nephila_nacrea/data/result-1',
+$jed->print_to_csv( '/home/vmihell-hale/nephila_nacrea/data/result-1',
     %gloss_hash );

@@ -6,6 +6,7 @@ use warnings;
 use Data::Dumper;
 use DOM::Tiny;
 use Moo;
+use Text::CSV;
 use XML::LibXML::Reader;
 
 has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
@@ -102,26 +103,26 @@ sub get_english_definitions {
     return %gloss_hash;
 }
 
-# Pretty-prints list of Japanese words with English glosses to a file.
+# Prints list of Japanese words with English glosses to a .csv file.
 # See get_english_definitions above for more detail on contents of
 # %gloss_hash.
 #
-# Each entry is printed in the following way:
-# <kanji>    <kana>    <English>
-#            [<kana>    <English>]
-#            [...]
+# Each entry is of one of the following forms:
+# <kanji>    <kana>    <English> [may be multiple entries for a single kanji]
 # or
 # <kana>    <English>[,<English>...]
 # or
 # <kanji/kana>    NO ENTRY FOUND
-sub pretty_print_to_file {
+sub print_to_csv {
     my ( $self, $filename, %gloss_hash ) = @_;
+
+    my $csv = Text::CSV->new(
+        { binary => 1, eol => "\012", quote_char => '', sep_char => "\t" } );
 
     open my $fh, '>', $filename or die $!;
 
-    for my $key ( keys %gloss_hash ) {
-        print $fh $key . '    ';
-
+    my @ordered_keys = sort keys %gloss_hash;
+    for my $key (@ordered_keys) {
         if ( ref $gloss_hash{$key} eq 'HASH' ) {
             # Kanji entry is hashref:
             #   <kanji> => {
@@ -130,10 +131,8 @@ sub pretty_print_to_file {
             my %kana_hash = %{ $gloss_hash{$key} };
 
             for my $kana ( keys %kana_hash ) {
-                print $fh $kana . '    ';
-
-                print $fh ( join ', ', @{ $kana_hash{$kana} } );
-                print $fh "\n";
+                $csv->print( $fh,
+                    [ $key, $kana, ( join "\t", @{ $kana_hash{$kana} } ) ] );
             }
         }
         elsif ( ref $gloss_hash{$key} eq 'ARRAY' ) {
@@ -142,14 +141,11 @@ sub pretty_print_to_file {
             #       [<glosses_1], ...,
             #   ],
             my @glosses = map @$_, @{ $gloss_hash{$key} };
-
-            print $fh ( join ', ', @glosses ) . '    ';
+            $csv->print( $fh, [ $key, ( join "\t", @glosses ) ] );
         }
         else {
-            print $fh 'NO ENTRY FOUND';
+            $csv->print( $fh, [ $key, 'NO_ENTRY_FOUND' ] );
         }
-
-        print $fh "\n";
     }
 
     close $fh;
