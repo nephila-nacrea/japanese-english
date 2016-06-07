@@ -11,15 +11,21 @@ use XML::LibXML::Reader;
 
 has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
 
-# TODO Might not need this
-has xml_file => ( is => 'ro' );
+# Builds dictionary from perl data structures that have been dumped into
+# files
+sub build_dictionary_from_perl {
+    my ( $self, $kana_filename, $kanji_filename ) = @_;
+    warn Dumper do $kana_filename;
+    $self->kana_dict( do $kana_filename );
+    $self->kanji_dict( do $kanji_filename );
+}
 
 sub build_dictionary_from_xml {
-    my $self = shift;
+    my ( $self, $file ) = @_;
 
     my $reader = XML::LibXML::Reader->new(
         encoding => 'utf8',
-        location => $self->xml_file,
+        location => $file,
     ) or die $!;
 
     while ( $reader->read ) {
@@ -28,26 +34,17 @@ sub build_dictionary_from_xml {
     }
 }
 
-# Builds dictionary from perl data structures that have been dumped into
-# files
-sub build_dictionary_from_perl {
-    my ( $self, $kana_filename, $kanji_filename ) = @_;
-
-    $self->kana_dict( do $kana_filename );
-    $self->kanji_dict( do $kanji_filename );
-}
-
 # Dumps contents of kana_dict and kanji_dict to files
 sub dump_perl_to_files {
     my ( $self, $kana_filename, $kanji_filename ) = @_;
 
     $Data::Dumper::Indent = 0;
 
-    open my $fh, '>', $kana_filename or die $!;
+    open my $fh, '>:utf8', $kana_filename or die $!;
     print $fh Dumper $self->kana_dict;
     close $fh;
 
-    open $fh, '>', $kanji_filename or die $!;
+    open $fh, '>:utf8', $kanji_filename or die $!;
     print $fh Dumper $self->kanji_dict;
     close $fh;
 }

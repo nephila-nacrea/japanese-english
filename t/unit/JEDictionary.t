@@ -289,10 +289,10 @@ is_deeply $jed->kanji_dict,
 #
 # Test build_dictionary_from_xml
 #
-$jed = new_dict( xml_file =>
-        '/home/vmihell-hale/nephila_nacrea/t/unit/data/test-dict.xml' );
+$jed = new_dict();
 
-$jed->build_dictionary_from_xml;
+$jed->build_dictionary_from_xml(
+    '/home/vmihell-hale/nephila_nacrea/t/data/test-dict.xml');
 
 is_deeply $jed->kana_dict,
     {
@@ -334,10 +334,10 @@ is_deeply $jed->kanji_dict,
 #
 # Test get_english_definitions
 #
-$jed = new_dict( xml_file =>
-        '/home/vmihell-hale/nephila_nacrea/t/unit/data/test-dict.xml' );
+$jed = new_dict();
 
-$jed->build_dictionary_from_xml;
+$jed->build_dictionary_from_xml(
+    '/home/vmihell-hale/nephila_nacrea/t/data/test-dict.xml');
 
 is_deeply { $jed->get_english_definitions('鳥打ち') },
     { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
@@ -387,8 +387,6 @@ cmp_deeply {
     },
     'get_english_definitions: multiple inputs';
 
-sub new_dict {
-    return JEDictionary->new(@_);
-}
+sub new_dict { JEDictionary->new }
 
 done_testing;
