@@ -15,7 +15,7 @@ has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
 # files
 sub build_dictionary_from_perl {
     my ( $self, $kana_filename, $kanji_filename ) = @_;
-    warn Dumper do $kana_filename;
+
     $self->kana_dict( do $kana_filename );
     $self->kanji_dict( do $kanji_filename );
 }

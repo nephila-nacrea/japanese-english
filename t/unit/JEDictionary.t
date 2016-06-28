@@ -1,4 +1,4 @@
-use lib '/home/vmihell-hale/nephila_nacrea/lib';
+use lib '../nephila_nacrea/lib';
 
 use strict;
 use utf8;
@@ -291,8 +291,7 @@ is_deeply $jed->kanji_dict,
 #
 $jed = new_dict();
 
-$jed->build_dictionary_from_xml(
-    '/home/vmihell-hale/nephila_nacrea/t/data/test-dict.xml');
+$jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
 
 is_deeply $jed->kana_dict,
     {
@@ -336,8 +335,7 @@ is_deeply $jed->kanji_dict,
 #
 $jed = new_dict();
 
-$jed->build_dictionary_from_xml(
-    '/home/vmihell-hale/nephila_nacrea/t/data/test-dict.xml');
+$jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
 
 is_deeply { $jed->get_english_definitions('鳥打ち') },
     { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },

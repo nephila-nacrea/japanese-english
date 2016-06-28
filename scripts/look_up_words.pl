@@ -1,4 +1,5 @@
-use lib '/home/vmihell-hale/nephila_nacrea/lib';
+use lib '../nephila_nacrea/lib';
+
 use strict;
 use warnings;
 use utf8;
@@ -7,8 +8,8 @@ use JEDictionary;
 
 my $jed = JEDictionary->new;
 $jed->build_dictionary_from_perl(
-    '/home/vmihell-hale/nephila_nacrea/data/kana-dict',
-    '/home/vmihell-hale/nephila_nacrea/data/kanji-dict',
+    '../nephila_nacrea/data/kana-dict',
+    '../nephila_nacrea/data/kanji-dict',
 );
 
 my @words = qw/脚本
@@ -57,9 +58,9 @@ my @words = qw/脚本
     五行
     恵む
     役割
-    例外/;
+    例外
+    /;
 
 my %gloss_hash = $jed->get_english_definitions(@words);
 
-$jed->print_to_csv( '/home/vmihell-hale/nephila_nacrea/data/result-1',
-    %gloss_hash );
+$jed->print_to_csv( '../nephila_nacrea/data/result-1', %gloss_hash );
