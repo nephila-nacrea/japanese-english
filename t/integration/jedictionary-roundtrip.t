@@ -21,10 +21,17 @@ $jed->build_dictionary_from_perl(
     '../nephila_nacrea/t/data/kanji-dict',
 );
 
-my @words
-    = qw/鳥打ち じしん 鳥打日 スチューデントアパシー 日/;
+my @words = (
+    '鳥打ち', 'じしん',
+    '鳥打日', 'スチューデントアパシー',
+    '日'
+);
 
 my %gloss_hash = $jed->get_english_definitions(@words);
+
 use Data::Dumper;
-warn Dumper \%gloss_hash;
+warn Dumper %gloss_hash;
+
+# FIXME Am not getting 'earthquake' unless I dump %gloss_hash here,
+# and then I lose English for 'student apathy'
 $jed->print_to_csv( '../nephila_nacrea/t/data/test-csv', %gloss_hash );

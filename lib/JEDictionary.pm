@@ -137,7 +137,9 @@ sub print_to_csv {
             #   <kana> => [
             #       [<glosses_1], ...,
             #   ],
-            my @glosses = map @$_, @{ $gloss_hash{$key} };
+
+            # FIXME Why are there undefs instead of arrayrefs?
+            my @glosses = map @{ $_ // [] }, @{ $gloss_hash{$key} };
             $csv->print( $fh, [ $key, ( join "\t", @glosses ) ] );
         }
         else {
