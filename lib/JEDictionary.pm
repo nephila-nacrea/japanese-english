@@ -96,7 +96,7 @@ sub get_english_definitions {
     #   <word that cannot be found> => {},
     #   ...,
     # }
-
+warn Dumper \%gloss_hash;
     return %gloss_hash;
 }
 

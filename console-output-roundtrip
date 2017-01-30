@@ -1,0 +1,13 @@
+# 'student apathy' only entry, dumped in both files
+Use of uninitialized value $_[0] in string at /usr/share/perl5/site_perl/Mojo/DOM58/_HTML.pm line 121, <DATA> line 2231.
+$VAR1 = {"\x{30b9}\x{30c1}\x{30e5}\x{30fc}\x{30c7}\x{30f3}\x{30c8}\x{30a2}\x{30d1}\x{30b7}\x{30fc}" => [['student apathy']]}; at ../nephila_nacrea/lib/JEDictionary.pm line 99, <DATA> line 2231.
+$VAR1 = "\x{30b9}\x{30c1}\x{30e5}\x{30fc}\x{30c7}\x{30f3}\x{30c8}\x{30a2}\x{30d1}\x{30b7}\x{30fc}";$VAR2 = [['student apathy']]; at t/integration/jedictionary-roundtrip.t line 47, <DATA> line 2231.
+Wide character in print at /usr/lib/perl5/core_perl/IO/Handle.pm line 420, <DATA> line 2231.
+
+# 'student apathy' only entry, dumped in both files - nothing changed but it
+# now doesn't have results!!!
+Use of uninitialized value $_[0] in string at /usr/share/perl5/site_perl/Mojo/DOM58/_HTML.pm line 121, <DATA> line 2231.
+$VAR1 = {"\x{30b9}\x{30c1}\x{30e5}\x{30fc}\x{30c7}\x{30f3}\x{30c8}\x{30a2}\x{30d1}\x{30b7}\x{30fc}" => [undef]}; at ../nephila_nacrea/lib/JEDictionary.pm line 99, <DATA> line 2231.
+$VAR1 = "\x{30b9}\x{30c1}\x{30e5}\x{30fc}\x{30c7}\x{30f3}\x{30c8}\x{30a2}\x{30d1}\x{30b7}\x{30fc}";$VAR2 = [undef]; at t/integration/jedictionary-roundtrip.t line 47, <DATA> line 2231.
+Wide character in print at /usr/lib/perl5/core_perl/IO/Handle.pm line 420, <DATA> line 2231.
+

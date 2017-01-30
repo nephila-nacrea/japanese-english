@@ -21,11 +21,25 @@ $jed->build_dictionary_from_perl(
     '../nephila_nacrea/t/data/kanji-dict',
 );
 
-my @words = (
-    '鳥打ち', 'じしん',
-    '鳥打日', 'スチューデントアパシー',
-    '日'
-);
+# my @words = (
+#     '鳥打ち', 'じしん',
+#     '鳥打日', 'スチューデントアパシー',
+#     '日'
+# );
+
+my @words;
+
+# push @words, '鳥打ち'; # Kanji & kana
+# push @words, '鳥打日'; # No entry found
+# push @words, '日'; # Kanji
+
+# FIXME Why does this not find definition for earthquake?
+# push @words, 'じしん'; # Hiragana only
+
+# FIXME This isn't always found
+# Found when:
+# Not found when:
+push @words, 'スチューデントアパシー'; # Katakana only
 
 my %gloss_hash = $jed->get_english_definitions(@words);
 
