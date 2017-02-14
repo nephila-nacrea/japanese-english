@@ -33,19 +33,16 @@ my @words;
 # push @words, '鳥打日'; # No entry found
 # push @words, '日'; # Kanji
 
-# FIXME Why does this not find definition for earthquake?
+# FIXME This isn't always found
 # push @words, 'じしん'; # Hiragana only
 
 # FIXME This isn't always found
-# Found when:
-# Not found when:
-push @words, 'スチューデントアパシー'; # Katakana only
+# Seems to be issue with dumping perl to files or building from these files.
+push @words, 'スチューデントアパシー';    # Katakana only
 
 my %gloss_hash = $jed->get_english_definitions(@words);
 
 use Data::Dumper;
 warn Dumper %gloss_hash;
 
-# FIXME Am not getting 'earthquake' unless I dump %gloss_hash here,
-# and then I lose English for 'student apathy'
 $jed->print_to_csv( '../nephila_nacrea/t/data/test-csv', %gloss_hash );

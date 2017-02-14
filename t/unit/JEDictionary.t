@@ -11,7 +11,6 @@ use Test::More;
 #
 # Test _add_to_dictionary
 #
-
 my $jed = new_dict();
 
 $jed->_add_to_dictionary(
@@ -331,7 +330,7 @@ is_deeply $jed->kanji_dict,
     'build_dictionary_from_xml: kanji_dict correct';
 
 #
-# Test get_english_definitions
+# Test get_english_definitions with dictionary built from xml
 #
 $jed = new_dict();
 
@@ -339,17 +338,17 @@ $jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
 
 is_deeply { $jed->get_english_definitions('鳥打ち') },
     { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
-    'get_english_definitions: kanji word';
+    'xml get_english_definitions: kanji word';
 
 is_deeply { $jed->get_english_definitions('とりうち') },
     { 'とりうち' => [ [ 'fowling', 'shooting birds' ] ] },
-    'get_english_definitions: kana word';
+    'xml get_english_definitions: kana word';
 
 is_deeply { $jed->get_english_definitions('じしん') },
     { 'じしん' =>
         [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
     },
-    'get_english_definitions: kana word with multiple gloss-groups';
+    'xml get_english_definitions: kana word with multiple gloss-groups';
 
 is_deeply { $jed->get_english_definitions('日') },
     {
@@ -363,15 +362,18 @@ is_deeply { $jed->get_english_definitions('日') },
         ],
     },
     },
-    'get_english_definitions: kanji word with multiple readings';
+    'xml get_english_definitions: kanji word with multiple readings';
 
 is_deeply { $jed->get_english_definitions('とりうちじしん') },
     { 'とりうちじしん' => undef },
-    'get_english_definitions: no match found';
+    'xml get_english_definitions: no match found';
 
 cmp_deeply {
-    $jed->get_english_definitions( 'とりうち', '地震',
-        'スチューデントアパシー' )
+    $jed->get_english_definitions(
+        'とりうち', '地震', 'じしん',
+        'スチューデントアパシー',
+        'スチューデント・アパシー'
+        )
 },
     {
     'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
@@ -381,9 +383,80 @@ cmp_deeply {
         'ない'       => ['earthquake'],
         'なえ'       => ['earthquake'],
     },
-    'スチューデントアパシー' => [ ['student apathy'] ],
+    'じしん' =>
+        [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
+    'スチューデントアパシー'    => [ ['student apathy'] ],
+    'スチューデント・アパシー' => [ ['student apathy'] ],
     },
-    'get_english_definitions: multiple inputs';
+    'xml get_english_definitions: multiple inputs';
+
+#
+# Test get_english_definitions with dictionary built from Perl
+#
+$jed = new_dict();
+
+$jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
+
+my @perl_dict_files = (
+    '../nephila_nacrea/t/unit/data/kana-dict',
+    '../nephila_nacrea/t/unit/data/kanji-dict',
+);
+$jed->dump_perl_to_files(@perl_dict_files);
+$jed->build_dictionary_from_perl(@perl_dict_files);
+
+is_deeply { $jed->get_english_definitions('鳥打ち') },
+    { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
+    'perl get_english_definitions: kanji word';
+
+is_deeply { $jed->get_english_definitions('とりうち') },
+    { 'とりうち' => [ [ 'fowling', 'shooting birds' ] ] },
+    'perl get_english_definitions: kana word';
+
+is_deeply { $jed->get_english_definitions('じしん') },
+    { 'じしん' =>
+        [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
+    },
+    'perl get_english_definitions: kana word with multiple gloss-groups';
+
+is_deeply { $jed->get_english_definitions('日') },
+    {
+    '日' => {
+        'か' => [ 'day of month', 'counter for days' ],
+        'にち' =>
+            [ 'Sunday', 'day (of the month)', 'counter for days', 'Japan' ],
+        'ひ' => [
+            'day', 'days', 'sun', 'sunshine', 'sunlight',
+            'case (esp. unfortunate)', 'event',
+        ],
+    },
+    },
+    'perl get_english_definitions: kanji word with multiple readings';
+
+is_deeply { $jed->get_english_definitions('とりうちじしん') },
+    { 'とりうちじしん' => undef },
+    'perl get_english_definitions: no match found';
+
+cmp_deeply {
+    $jed->get_english_definitions(
+        'とりうち', '地震', 'じしん',
+        'スチューデントアパシー',
+        'スチューデント・アパシー'
+        )
+},
+    {
+    'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
+    '地震' => {
+        'じしん'    => ['earthquake'],
+        'じぶるい' => ['earthquake'],
+        'ない'       => ['earthquake'],
+        'なえ'       => ['earthquake'],
+    },
+    'じしん' =>
+        [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
+    'スチューデントアパシー'    => [ ['student apathy'] ],
+    'スチューデント・アパシー' => [ ['student apathy'] ],
+    },
+    'perl get_english_definitions: multiple inputs';
 
 sub new_dict { JEDictionary->new }
 
