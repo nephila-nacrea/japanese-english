@@ -5,19 +5,21 @@ use warnings;
 
 use Data::Dumper;
 use DOM::Tiny;
+use File::Slurper 'read_binary';
 use Moo;
+# FIXME Use OO interface for Sereal (see https://metacpan.org/pod/Sereal)
+use Sereal qw/decode_sereal encode_sereal/;
 use Text::CSV;
 use XML::LibXML::Reader;
 
 has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
 
-# Builds dictionary from perl data structures that have been dumped into
-# files
-sub build_dictionary_from_perl {
+# Builds dictionary from binary that has been dumped into files
+sub build_dictionary_from_binary {
     my ( $self, $kana_filename, $kanji_filename ) = @_;
 
-    $self->kana_dict( do $kana_filename );
-    $self->kanji_dict( do $kanji_filename );
+    $self->kana_dict( decode_sereal( read_binary $kana_filename ) );
+    $self->kanji_dict( decode_sereal( read_binary $kanji_filename ) );
 }
 
 sub build_dictionary_from_xml {
@@ -34,19 +36,17 @@ sub build_dictionary_from_xml {
     }
 }
 
-# Dumps contents of kana_dict and kanji_dict to files
-sub dump_perl_to_files {
+# Converts kana_dict and kanji_dict hashrefs to binary & writes to files
+sub write_dict_hashrefs_to_binary_files {
     my ( $self, $kana_filename, $kanji_filename ) = @_;
 
-    $Data::Dumper::Indent = 0;
+    open my $fh, '>:raw', $kana_filename or die $!;
+    print $fh encode_sereal( $self->kana_dict );
+    close $fh or die $!;
 
-    open my $fh, '>:utf8', $kana_filename or die $!;
-    print $fh Dumper $self->kana_dict;
-    close $fh;
-
-    open $fh, '>:utf8', $kanji_filename or die $!;
-    print $fh Dumper $self->kanji_dict;
-    close $fh;
+    open $fh, '>:raw', $kanji_filename or die $!;
+    print $fh encode_sereal( $self->kanji_dict );
+    close $fh or die $!;
 }
 
 sub get_english_definitions {

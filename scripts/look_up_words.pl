@@ -7,7 +7,7 @@ use utf8;
 use JEDictionary;
 
 my $jed = JEDictionary->new;
-$jed->build_dictionary_from_perl(
+$jed->build_dictionary_from_binary(
     '../nephila_nacrea/data/kana-dict',
     '../nephila_nacrea/data/kanji-dict',
 );

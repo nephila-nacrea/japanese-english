@@ -391,32 +391,32 @@ cmp_deeply {
     'xml get_english_definitions: multiple inputs';
 
 #
-# Test get_english_definitions with dictionary built from Perl
+# Test get_english_definitions with dictionary built from binary
 #
 $jed = new_dict();
 
 $jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
 
-my @perl_dict_files = (
+my @binary_dict_files = (
     '../nephila_nacrea/t/unit/data/kana-dict',
     '../nephila_nacrea/t/unit/data/kanji-dict',
 );
-$jed->dump_perl_to_files(@perl_dict_files);
-$jed->build_dictionary_from_perl(@perl_dict_files);
+$jed->write_dict_hashrefs_to_binary_files(@binary_dict_files);
+$jed->build_dictionary_from_binary(@binary_dict_files);
 
 is_deeply { $jed->get_english_definitions('鳥打ち') },
     { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
-    'perl get_english_definitions: kanji word';
+    'binary get_english_definitions: kanji word';
 
 is_deeply { $jed->get_english_definitions('とりうち') },
     { 'とりうち' => [ [ 'fowling', 'shooting birds' ] ] },
-    'perl get_english_definitions: kana word';
+    'binary get_english_definitions: kana word';
 
 is_deeply { $jed->get_english_definitions('じしん') },
     { 'じしん' =>
         [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
     },
-    'perl get_english_definitions: kana word with multiple gloss-groups';
+    'binary get_english_definitions: kana word with multiple gloss-groups';
 
 is_deeply { $jed->get_english_definitions('日') },
     {
@@ -430,11 +430,11 @@ is_deeply { $jed->get_english_definitions('日') },
         ],
     },
     },
-    'perl get_english_definitions: kanji word with multiple readings';
+    'binary get_english_definitions: kanji word with multiple readings';
 
 is_deeply { $jed->get_english_definitions('とりうちじしん') },
     { 'とりうちじしん' => undef },
-    'perl get_english_definitions: no match found';
+    'binary get_english_definitions: no match found';
 
 cmp_deeply {
     $jed->get_english_definitions(
@@ -456,7 +456,7 @@ cmp_deeply {
     'スチューデントアパシー'    => [ ['student apathy'] ],
     'スチューデント・アパシー' => [ ['student apathy'] ],
     },
-    'perl get_english_definitions: multiple inputs';
+    'binary get_english_definitions: multiple inputs';
 
 sub new_dict { JEDictionary->new }
 
