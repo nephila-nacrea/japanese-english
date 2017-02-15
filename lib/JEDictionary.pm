@@ -3,7 +3,6 @@ package JEDictionary;
 use strict;
 use warnings;
 
-use Data::Dumper;
 use DOM::Tiny;
 use File::Slurper 'read_binary';
 use Moo;
