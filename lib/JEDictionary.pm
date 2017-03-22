@@ -5,6 +5,7 @@ use warnings;
 
 use DOM::Tiny;
 use File::Slurper 'read_binary';
+use MeCab;
 use Moo;
 # FIXME Use OO interface for Sereal (see https://metacpan.org/pod/Sereal)
 use Sereal qw/decode_sereal encode_sereal/;
@@ -54,32 +55,7 @@ sub get_english_definitions {
     my %gloss_hash;
 
     for my $word (@jp_words) {
-        # Look in kanji dictionary first.
-        # $kana_href is of the form
-        # { <kana_reading> => <gloss_index>, ... }
-        if ( my $kana_href = $self->kanji_dict->{$word} ) {
-            # There may be several kana readings for a kanji, which
-            # may or may not share the same glosses.
-            # Just get the glosses for each one, though there may be
-            # repetition.
-            for my $kana ( keys %$kana_href ) {
-                my $gloss_index = $kana_href->{$kana};
-
-                # Find gloss(es) in kana dictionary
-                $gloss_hash{$word}->{$kana}
-                    = $self->kana_dict->{$kana}->[$gloss_index];
-            }
-        }
-        elsif ( my $glosses = $self->kana_dict->{$word} ) {
-            # Word not found in kanji dictionary;
-            # is written in kana alone.
-            # So just get all glosses for that kana entry.
-            $gloss_hash{$word} = $glosses;
-        }
-        else {
-            # The word cannot be found
-            $gloss_hash{$word} = undef;
-        }
+        $self->_add_definition_for_word( \%gloss_hash, $word );
     }
 
     # Gloss hash will be of form
@@ -149,6 +125,47 @@ sub print_to_csv {
     close $fh;
 }
 
+sub _add_definition_for_word {
+    my ( $self, $gloss_hashref, $word ) = @_;
+
+    # Look in kanji dictionary first.
+    # $kana_href is of the form
+    # { <kana_reading> => <gloss_index>, ... }
+    if ( my $kana_href = $self->kanji_dict->{$word} ) {
+        # There may be several kana readings for a kanji, which
+        # may or may not share the same glosses.
+        # Just get the glosses for each one, though there may be
+        # repetition.
+        for my $kana ( keys %$kana_href ) {
+            my $gloss_index = $kana_href->{$kana};
+
+            # Find gloss(es) in kana dictionary
+            $gloss_hashref->{$word}{$kana}
+                = $self->kana_dict->{$kana}->[$gloss_index];
+        }
+    }
+    elsif ( my $glosses = $self->kana_dict->{$word} ) {
+        # Word not found in kanji dictionary;
+        # is written in kana alone.
+        # So just get all glosses for that kana entry.
+        $gloss_hashref->{$word} = $glosses;
+    }
+    else {
+        # Word cannot be found - perhaps it is a phrase that can be
+        # tokenised.
+        my @tokens = _tokenise($word);
+
+        # No point checking further if there is only one token, as will only
+        # have same result (or lack thereof) as before.
+        if ( @tokens > 1 ) {
+            $self->_add_definition_for_word( $gloss_hashref, $_ ) for @tokens;
+        }
+        else {
+            $gloss_hashref->{$word} = undef;
+        }
+    }
+}
+
 sub _add_to_dictionary {
     my ( $self, $xml ) = @_;
 
@@ -192,6 +209,28 @@ sub _add_to_dictionary {
                 = $gloss_index;
         }
     }
+}
+
+sub _tokenise {
+    my $phrase = shift;
+
+    my $model  = MeCab::Model->new;
+    my $tagger = $model->createTagger;
+
+    my $node_iter = $tagger->parseToNode($phrase);
+
+    my @words;
+    while ($node_iter) {
+        my $surface_form = $node_iter->{surface};
+
+        # First and last elements are empty so we do not want to include
+        # those.
+        push @words, $surface_form if $surface_form;
+
+        $node_iter = $node_iter->{next};
+    }
+
+    return @words;
 }
 
 1;

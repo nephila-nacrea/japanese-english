@@ -87,8 +87,15 @@ is_deeply { $jed->get_english_definitions('日') },
     },
     'xml get_english_definitions: kanji word with multiple readings';
 
+use Data::Dumper;
+warn Dumper { $jed->get_english_definitions('とりうちじしん') };
 is_deeply { $jed->get_english_definitions('とりうちじしん') },
-    { 'とりうちじしん' => undef },
+    {
+    'とり' => undef,
+    'うち' => undef,
+    'じし' => undef,
+    'ん'    => undef,
+    },
     'xml get_english_definitions: no match found';
 
 cmp_deeply {
@@ -156,7 +163,11 @@ is_deeply { $jed->get_english_definitions('日') },
     'binary get_english_definitions: kanji word with multiple readings';
 
 is_deeply { $jed->get_english_definitions('とりうちじしん') },
-    { 'とりうちじしん' => undef },
+    {
+    'とり'    => undef,
+    'うち'    => undef,
+    'じしん' => undef,
+    },
     'binary get_english_definitions: no match found';
 
 cmp_deeply {
