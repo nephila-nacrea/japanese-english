@@ -1,4 +1,4 @@
-use lib '../nephila_nacrea/lib';
+use lib '../japanese-english/lib';
 
 use strict;
 use utf8;
@@ -13,7 +13,7 @@ use Test::More;
 #
 my $jed = new_dict();
 
-$jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
+$jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
 
 is_deeply $jed->kana_dict,
     {
@@ -57,7 +57,7 @@ is_deeply $jed->kanji_dict,
 #
 $jed = new_dict();
 
-$jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
+$jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
 
 is_deeply { $jed->get_english_definitions('鳥打ち') },
     { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
@@ -125,11 +125,11 @@ cmp_deeply {
 #
 $jed = new_dict();
 
-$jed->build_dictionary_from_xml('../nephila_nacrea/t/data/test-dict.xml');
+$jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
 
 my @binary_dict_files = (
-    '../nephila_nacrea/t/unit/data/kana-dict',
-    '../nephila_nacrea/t/unit/data/kanji-dict',
+    '../japanese-english/t/unit/data/kana-dict',
+    '../japanese-english/t/unit/data/kanji-dict',
 );
 $jed->write_dict_hashrefs_to_binary_files(@binary_dict_files);
 $jed->build_dictionary_from_binary(@binary_dict_files);

@@ -1,4 +1,4 @@
-use lib '../nephila_nacrea/lib';
+use lib '../japanese-english/lib';
 
 use strict;
 use warnings;
@@ -13,6 +13,6 @@ my $jed = JEDictionary->new;
 $jed->build_dictionary_from_xml('../dictionaries/JMdict_e');
 
 $jed->write_dict_hashrefs_to_binary_files(
-    '../nephila_nacrea/data/kana-dict',
-    '../nephila_nacrea/data/kanji-dict',
+    '../japanese-english/data/kana-dict',
+    '../japanese-english/data/kanji-dict',
 );

@@ -1,4 +1,4 @@
-use lib '../nephila_nacrea/lib';
+use lib '../japanese-english/lib';
 
 use strict;
 use utf8;

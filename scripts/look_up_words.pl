@@ -1,4 +1,4 @@
-use lib '../nephila_nacrea/lib';
+use lib '../japanese-english/lib';
 
 use strict;
 use warnings;
@@ -8,8 +8,8 @@ use JEDictionary;
 
 my $jed = JEDictionary->new;
 $jed->build_dictionary_from_binary(
-    '../nephila_nacrea/data/kana-dict',
-    '../nephila_nacrea/data/kanji-dict',
+    '../japanese-english/data/kana-dict',
+    '../japanese-english/data/kanji-dict',
 );
 
 my @words = qw/脚本
@@ -63,4 +63,4 @@ my @words = qw/脚本
 
 my %gloss_hash = $jed->get_english_definitions(@words);
 
-$jed->print_to_csv( '../nephila_nacrea/data/result-1', %gloss_hash );
+$jed->print_to_csv( '../japanese-english/data/result-1', %gloss_hash );

@@ -3,9 +3,9 @@ package JEDictionary;
 use strict;
 use warnings;
 
-use DOM::Tiny;
+use Mojo::DOM58;
 use File::Slurper 'read_binary';
-use MeCab;
+use Text::MeCab;
 use Moo;
 # FIXME Use OO interface for Sereal (see https://metacpan.org/pod/Sereal)
 use Sereal qw/decode_sereal encode_sereal/;
@@ -169,7 +169,7 @@ sub _add_definition_for_word {
 sub _add_to_dictionary {
     my ( $self, $xml ) = @_;
 
-    my $dom = DOM::Tiny->new($xml);
+    my $dom = Mojo::DOM58->new($xml);
 
     # An entry should always have at least one kana reading ('reb'
     # element) and one English definition ('gloss' element), so skip
@@ -214,20 +214,15 @@ sub _add_to_dictionary {
 sub _tokenise {
     my $phrase = shift;
 
-    my $model  = MeCab::Model->new;
-    my $tagger = $model->createTagger;
-
-    my $node_iter = $tagger->parseToNode($phrase);
+    my $mecab = Text::MeCab->new;
 
     my @words;
-    while ($node_iter) {
-        my $surface_form = $node_iter->{surface};
+    for ( my $node = $mecab->parse($phrase); $node; $node = $node->next ) {
+        my $surface_form = $node->surface;
 
         # First and last elements are empty so we do not want to include
         # those.
         push @words, $surface_form if $surface_form;
-
-        $node_iter = $node_iter->{next};
     }
 
     return @words;
