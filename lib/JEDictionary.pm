@@ -3,13 +3,14 @@ package JEDictionary;
 use strict;
 use warnings;
 
-use Mojo::DOM58;
+use Unicode::UTF8 'decode_utf8';
 use File::Slurper 'read_binary';
-use Text::MeCab;
+use Mojo::DOM58;
 use Moo;
 # FIXME Use OO interface for Sereal (see https://metacpan.org/pod/Sereal)
 use Sereal qw/decode_sereal encode_sereal/;
 use Text::CSV;
+use Text::MeCab;
 use XML::LibXML::Reader;
 
 has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
@@ -222,7 +223,9 @@ sub _tokenise {
 
         # First and last elements are empty so we do not want to include
         # those.
-        push @words, $surface_form if $surface_form;
+        # Text::MeCab evidently does some kind of encoding, as we have to
+        # use decode_utf8 to avoid double-encoded strings.
+        push @words, decode_utf8 $surface_form if $surface_form;
     }
 
     return @words;

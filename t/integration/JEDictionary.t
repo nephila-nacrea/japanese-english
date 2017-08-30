@@ -5,8 +5,7 @@ use utf8;
 use warnings;
 
 use JEDictionary;
-use Test::Deep;
-use Test::More;
+use Test2::V0;
 
 #
 # Test build_dictionary_from_xml
@@ -15,7 +14,7 @@ my $jed = new_dict();
 
 $jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
 
-is_deeply $jed->kana_dict,
+is $jed->kana_dict,
     {
     'か' => [ [ 'day of month', 'counter for days' ] ],
     'じしん' =>
@@ -33,11 +32,15 @@ is_deeply $jed->kana_dict,
     ],
     'スチューデントアパシー'    => [ ['student apathy'] ],
     'スチューデント・アパシー' => [ ['student apathy'] ],
+    'とり' =>
+        [ [ 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ] ],
     },
     'build_dictionary_from_xml: kana_dict correct';
 
-is_deeply $jed->kanji_dict,
+is $jed->kanji_dict,
     {
+    '鳥'    => { 'とり' => 0, },
+    '禽'    => { 'とり' => 0, },
     '地震' => {
         'じしん'    => 1,
         'ない'       => 0,
@@ -59,21 +62,21 @@ $jed = new_dict();
 
 $jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
 
-is_deeply { $jed->get_english_definitions('鳥打ち') },
+is { $jed->get_english_definitions('鳥打ち') },
     { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
     'xml get_english_definitions: kanji word';
 
-is_deeply { $jed->get_english_definitions('とりうち') },
+is { $jed->get_english_definitions('とりうち') },
     { 'とりうち' => [ [ 'fowling', 'shooting birds' ] ] },
     'xml get_english_definitions: kana word';
 
-is_deeply { $jed->get_english_definitions('じしん') },
+is { $jed->get_english_definitions('じしん') },
     { 'じしん' =>
         [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
     },
     'xml get_english_definitions: kana word with multiple gloss-groups';
 
-is_deeply { $jed->get_english_definitions('日') },
+is { $jed->get_english_definitions('日') },
     {
     '日' => {
         'か' => [ 'day of month', 'counter for days' ],
@@ -87,18 +90,25 @@ is_deeply { $jed->get_english_definitions('日') },
     },
     'xml get_english_definitions: kanji word with multiple readings';
 
-use Data::Dumper;
-warn Dumper { $jed->get_english_definitions('とりうちじしん') };
-is_deeply { $jed->get_english_definitions('とりうちじしん') },
+is { $jed->get_english_definitions('うちじしん') },
     {
-    'とり' => undef,
     'うち' => undef,
     'じし' => undef,
     'ん'    => undef,
     },
-    'xml get_english_definitions: no match found';
+    'xml get_english_definitions: no matches found';
 
-cmp_deeply {
+is { $jed->get_english_definitions('とりうちじしん') },
+    {
+    'とり' =>
+        [ [ 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ] ],
+    'うち' => undef,
+    'じし' => undef,
+    'ん'    => undef,
+    },
+    'xml get_english_definitions: match found from tokenisation';
+
+is {
     $jed->get_english_definitions(
         'とりうち', '地震', 'じしん',
         'スチューデントアパシー',
@@ -134,21 +144,21 @@ my @binary_dict_files = (
 $jed->write_dict_hashrefs_to_binary_files(@binary_dict_files);
 $jed->build_dictionary_from_binary(@binary_dict_files);
 
-is_deeply { $jed->get_english_definitions('鳥打ち') },
+is { $jed->get_english_definitions('鳥打ち') },
     { '鳥打ち' => { 'とりうち' => [ 'fowling', 'shooting birds' ] }, },
     'binary get_english_definitions: kanji word';
 
-is_deeply { $jed->get_english_definitions('とりうち') },
+is { $jed->get_english_definitions('とりうち') },
     { 'とりうち' => [ [ 'fowling', 'shooting birds' ] ] },
     'binary get_english_definitions: kana word';
 
-is_deeply { $jed->get_english_definitions('じしん') },
+is { $jed->get_english_definitions('じしん') },
     { 'じしん' =>
         [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
     },
     'binary get_english_definitions: kana word with multiple gloss-groups';
 
-is_deeply { $jed->get_english_definitions('日') },
+is { $jed->get_english_definitions('日') },
     {
     '日' => {
         'か' => [ 'day of month', 'counter for days' ],
@@ -162,15 +172,25 @@ is_deeply { $jed->get_english_definitions('日') },
     },
     'binary get_english_definitions: kanji word with multiple readings';
 
-is_deeply { $jed->get_english_definitions('とりうちじしん') },
+is { $jed->get_english_definitions('うちじしん') },
     {
-    'とり'    => undef,
-    'うち'    => undef,
-    'じしん' => undef,
+    'うち' => undef,
+    'じし' => undef,
+    'ん'    => undef,
     },
-    'binary get_english_definitions: no match found';
+    'binary get_english_definitions: no matches found';
 
-cmp_deeply {
+is { $jed->get_english_definitions('とりうちじしん') },
+    {
+    'とり' =>
+        [ [ 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ] ],
+    'うち' => undef,
+    'じし' => undef,
+    'ん'    => undef,
+    },
+    'binary get_english_definitions: match found via tokenisation';
+
+is {
     $jed->get_english_definitions(
         'とりうち', '地震', 'じしん',
         'スチューデントアパシー',

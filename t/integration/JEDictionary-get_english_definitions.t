@@ -5,8 +5,7 @@ use utf8;
 use warnings;
 
 use JEDictionary;
-use Test::Deep;
-use Test::More;
+use Test2::V0;
 
 # Test get_english_definitions
 # for phrases
@@ -14,10 +13,7 @@ use Test::More;
 my $jed = JEDictionary->new;
 $jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
 
-use Data::Dumper;
-warn Dumper $jed->get_english_definitions('地震自信');
-
-cmp_deeply { $jed->get_english_definitions('地震自信') },
+is { $jed->get_english_definitions('地震自信') },
     {
     '地震' => {
         'じしん'    => ['earthquake'],

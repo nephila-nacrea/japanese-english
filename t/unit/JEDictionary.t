@@ -5,8 +5,7 @@ use utf8;
 use warnings;
 
 use JEDictionary;
-use Test::Deep;
-use Test::More;
+use Test2::V0;
 
 #
 # Test _add_to_dictionary
@@ -18,8 +17,8 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is_deeply $jed->kana_dict,  {}, 'Add empty entry to kana_dict';
-is_deeply $jed->kanji_dict, {}, 'Add empty entry to kanji_dict';
+is $jed->kana_dict,  {}, 'Add empty entry to kana_dict';
+is $jed->kanji_dict, {}, 'Add empty entry to kanji_dict';
 
 # No keb (kanji entry)
 $jed = new_dict();
@@ -37,9 +36,9 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is_deeply $jed->kana_dict, { 'としとる' => [ ['to grow old'] ] },
+is $jed->kana_dict, { 'としとる' => [ ['to grow old'] ] },
     'Add entry with no kanji: kana_dict';
-is_deeply $jed->kanji_dict, {}, 'Add entry with no kanji: kanji_dict';
+is $jed->kanji_dict, {}, 'Add entry with no kanji: kanji_dict';
 
 # No reb (kana entry)
 $jed = new_dict();
@@ -57,8 +56,8 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is_deeply $jed->kana_dict,  {}, 'Add entry with no kana: kana_dict';
-is_deeply $jed->kanji_dict, {}, 'Add entry with no kana: kanji_dict';
+is $jed->kana_dict,  {}, 'Add entry with no kana: kana_dict';
+is $jed->kanji_dict, {}, 'Add entry with no kana: kanji_dict';
 
 # No gloss
 $jed = new_dict();
@@ -78,8 +77,8 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is_deeply $jed->kana_dict,  {}, 'Add entry with no gloss: kana_dict';
-is_deeply $jed->kanji_dict, {}, 'Add entry with no gloss: kanji_dict';
+is $jed->kana_dict,  {}, 'Add entry with no gloss: kana_dict';
+is $jed->kanji_dict, {}, 'Add entry with no gloss: kanji_dict';
 
 # One of each (keb & reb)
 $jed = new_dict();
@@ -100,9 +99,9 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is_deeply $jed->kana_dict, { 'としとる' => [ ['to grow old'] ] },
+is $jed->kana_dict, { 'としとる' => [ ['to grow old'] ] },
     'Add entry with one of each element: kana_dict';
-is_deeply $jed->kanji_dict, { '年取る' => { 'としとる' => 0 } },
+is $jed->kanji_dict, { '年取る' => { 'としとる' => 0 } },
     'Add entry with one of each element: kanji_dict';
 
 # Two of each (keb & reb)
@@ -131,13 +130,13 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is_deeply $jed->kana_dict,
+is $jed->kana_dict,
     {
     'としとる' => [ [ 'to grow old', 'to age' ] ],
     'トシトル' => [ [ 'to grow old', 'to age' ] ],
     },
     'Add entry with two of each element: kana_dict';
-is_deeply $jed->kanji_dict,
+is $jed->kanji_dict,
     {
     '年取る' => { 'としとる' => 0, 'トシトル' => 0, },
     '歳取る' => { 'としとる' => 0, 'トシトル' => 0, },
@@ -175,10 +174,10 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is_deeply $jed->kana_dict,
+is $jed->kana_dict,
     { 'じしん' => [ ['confidence'], ['earthquake'] ] },
     'Kanji with same kana reading: kana_dict';
-is_deeply $jed->kanji_dict,
+is $jed->kanji_dict,
     {
     '自信' => { 'じしん' => 0 },
     '地震' => { 'じしん' => 1 },
@@ -255,7 +254,7 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-cmp_deeply $jed->kana_dict,
+is $jed->kana_dict,
     {
     'か' => [ [ 'day of month', 'counter for days' ] ],
     'にち' =>
@@ -267,7 +266,7 @@ cmp_deeply $jed->kana_dict,
     ],
     },
     'Identical kanji with different readings: kana_dict';
-is_deeply $jed->kanji_dict,
+is $jed->kanji_dict,
     {
     '日' => {
         'か'    => 0,

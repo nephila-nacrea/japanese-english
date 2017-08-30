@@ -6,7 +6,10 @@ use warnings;
 
 use JEDictionary;
 
-# Roundtrip test
+# Roundtrip 'test'.
+# Not (currently) a test file in the strictest sense, as there are no tests
+# for 'prove' to run, but is still useful for checking overall behaviour of
+# JEDictionary.pm
 my $jed = JEDictionary->new;
 
 $jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
