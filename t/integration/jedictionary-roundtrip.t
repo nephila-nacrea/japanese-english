@@ -10,7 +10,7 @@ use JEDictionary;
 # Not (currently) a test file in the strictest sense, as there are no tests
 # for 'prove' to run, but is still useful for checking overall behaviour of
 # JEDictionary.pm
-my $jed = JEDictionary->new;
+my $jed = JEDictionary->new( no_dictionary_build => 1 );
 
 $jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
 

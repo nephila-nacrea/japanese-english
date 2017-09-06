@@ -277,6 +277,6 @@ is $jed->kanji_dict,
     },
     'Identical kanji with different readings: kanji_dict';
 
-sub new_dict { JEDictionary->new }
+sub new_dict { JEDictionary->new( no_dictionary_build => 1 ) }
 
 done_testing;

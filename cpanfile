@@ -1,0 +1,9 @@
+requires 'File::Slurper';
+requires 'Mojo::DOM58';
+requires 'Moo';
+requires 'Sereal';
+requires 'Text::CSV';
+requires 'Text::MeCab';
+requires 'Unicode::UTF8';
+requires 'XML::LibXML::Reader';
+requires 'Test2::V0';

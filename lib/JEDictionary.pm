@@ -3,7 +3,6 @@ package JEDictionary;
 use strict;
 use warnings;
 
-use Unicode::UTF8 'decode_utf8';
 use File::Slurper 'read_binary';
 use Mojo::DOM58;
 use Moo;
@@ -11,9 +10,32 @@ use Moo;
 use Sereal qw/decode_sereal encode_sereal/;
 use Text::CSV;
 use Text::MeCab;
+use Unicode::UTF8 'decode_utf8';
 use XML::LibXML::Reader;
 
-has [qw/kana_dict kanji_dict/] => ( default => sub { {} }, is => 'rw' );
+use constant {
+    DEFAULT_KANA_FILENAME  => '../japanese-english/data/kana-dict',
+    DEFAULT_KANJI_FILENAME => '../japanese-english/data/kanji-dict',
+};
+
+has kana_dict  => ( default => sub { {} }, is => 'rw' );
+has kanji_dict => ( default => sub { {} }, is => 'rw' );
+
+sub BUILD {
+    my ( $self, $args ) = @_;
+
+    # no_dictionary_build is used for testing purposes, to force an empty
+    # dictionary
+    return if $args->{no_dictionary_build};
+
+    return $self->build_dictionary_from_xml( $args->{xml_filename} )
+        if $args->{xml_filename};
+
+    $self->build_dictionary_from_binary(
+        $args->{kana_filename}  || DEFAULT_KANA_FILENAME,
+        $args->{kanji_filename} || DEFAULT_KANJI_FILENAME
+    );
+}
 
 # Builds dictionary from binary that has been dumped into files
 sub build_dictionary_from_binary {

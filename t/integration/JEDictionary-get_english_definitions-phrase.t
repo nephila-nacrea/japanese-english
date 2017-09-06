@@ -10,8 +10,8 @@ use Test2::V0;
 # Test get_english_definitions
 # for phrases
 
-my $jed = JEDictionary->new;
-$jed->build_dictionary_from_xml('../japanese-english/t/data/test-dict.xml');
+my $jed = JEDictionary->new(
+    xml_filename => '../japanese-english/t/data/test-dict.xml' );
 
 is { $jed->get_english_definitions('地震自信') },
     {
