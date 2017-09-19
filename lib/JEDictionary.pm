@@ -206,15 +206,27 @@ sub _add_to_dictionary {
 
     my $kanji_elems = $dom->find('keb');
 
+    # We also want the part-of-speech (POS) tags (whether the word is a
+    # noun, verb, etc.) May be more than one tag.
+
+    # TODO What if no POS? Default to empty string?
+    my $pos_elems = $dom->find('pos');
+    $pos_elems = [ map $_->text, @$pos_elems ];
+
     for my $kana (@$kana_elems) {
         # Add to the kana_dict hashref.
-        # Each value is an arrayref of arrayrefs,
-        # that each contain the glosses for a particular kanji reading
-        # (as a kana reading may map to multiple kanji readings,
+        # Each kana key points to an arrayref of arrayrefs, with each of
+        # these inner arrayrefs having an arrayref of POS tags as its first
+        # element and an arrayref of glosses as its second.
+        #
+        # This innermost arrayref of glosses is for a particular kanji
+        # reading (as a kana reading may map to multiple kanji readings,
         # e.g. 地震 and 自信 both map to じしん).
+        #
         # The index of each new arrayref is used in the kanji dictionary
         # below.
-        push @{ $self->kana_dict->{ $kana->text } }, \@gloss_texts;
+        push @{ $self->kana_dict->{ $kana->text } },
+            [ $pos_elems, \@gloss_texts ];
 
         my $gloss_index = @{ $self->kana_dict->{ $kana->text } } - 1;
 
