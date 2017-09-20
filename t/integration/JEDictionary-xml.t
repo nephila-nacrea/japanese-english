@@ -21,27 +21,39 @@ my $jed_2 = JEDictionary->new( xml_filename => $xml_filename );
 for ( $jed_1, $jed_2 ) {
     is $_->kana_dict,
         {
-        'か' => [ [ 'day of month', 'counter for days' ] ],
+        'か' =>
+            [ [ [qw/n-suf ctr/], [ 'day of month', 'counter for days' ] ] ],
         'じしん' => [
-            [ 'self-confidence', 'confidence (in oneself)' ],
-            ['earthquake'],
+            [ [qw/n vs/], [ 'self-confidence', 'confidence (in oneself)' ] ],
+            [ ['n'], ['earthquake'] ],
         ],
-        'じぶるい' => [ ['earthquake'] ],
-        'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
-        'ない'       => [ ['earthquake'] ],
-        'なえ'       => [ ['earthquake'] ],
+        'じぶるい' => [ [ ['n'], ['earthquake'] ] ],
+        'とりうち' => [ [ ['n'], [ 'fowling', 'shooting birds' ] ] ],
+        'ない'       => [ [ ['n'], ['earthquake'] ] ],
+        'なえ'       => [ [ ['n'], ['earthquake'] ] ],
         'にち' => [
-            [ 'Sunday', 'day (of the month)', 'counter for days', 'Japan' ]
+            [ ['n'],                ['Sunday'], ],
+            [ ['suf'],              ['day (of the month)'], ],
+            [ [qw/suf ctr/],        ['counter for days'], ],
+            [ [qw/n n-suf n-pref/], ['Japan'], ],
         ],
         'ひ' => [
-            [   'day', 'days', 'sun', 'sunshine', 'sunlight',
-                'case (esp. unfortunate)', 'event',
-            ]
+            [   ['n'],
+                [   'day', 'days', 'sun', 'sunshine', 'sunlight',
+                    'case (esp. unfortunate)', 'event',
+                ]
+            ],
         ],
-        'スチューデントアパシー'    => [ ['student apathy'] ],
-        'スチューデント・アパシー' => [ ['student apathy'] ],
-        'とり'                               => [
-            [ 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ]
+        'スチューデントアパシー' =>
+            [ [ ['n'], ['student apathy'] ] ],
+        'スチューデント・アパシー' =>
+            [ ['n'], [ ['student apathy'] ] ],
+        'とり' => [
+            [   ['n'],
+                [   'bird', 'bird meat (esp. chicken meat)', 'fowl',
+                    'poultry'
+                ]
+            ],
         ],
         },
         'build_dictionary_from_xml: kana_dict correct';
