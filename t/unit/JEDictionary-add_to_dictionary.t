@@ -36,7 +36,8 @@ $jed->_add_to_dictionary(
     </entry>'
 );
 
-is $jed->kana_dict, { 'としとる' => [ ['to grow old'] ] },
+is $jed->kana_dict,
+    { 'としとる' => [ [ [qw/&v5r &vi/], ['to grow old'] ] ] },
     'Add entry with no kanji: kana_dict';
 is $jed->kanji_dict, {}, 'Add entry with no kanji: kanji_dict';
 

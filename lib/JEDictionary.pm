@@ -88,7 +88,7 @@ sub get_english_definitions {
     #   },
     #   ...,
     #   <kana> => [
-    #       [<glosses_1], ...,
+    #       [<glosses_1>], ...,
     #   ],
     #   ...,
     #   <word that cannot be found> => {},
@@ -153,25 +153,32 @@ sub _add_definition_for_word {
 
     # Look in kanji dictionary first.
     # $kana_href is of the form
-    # { <kana_reading> => <gloss_index>, ... }
+    # { <kana_reading> => <entry_key>, ... }
     if ( my $kana_href = $self->kanji_dict->{$word} ) {
         # There may be several kana readings for a kanji, which
         # may or may not share the same glosses.
         # Just get the glosses for each one, though there may be
         # repetition.
         for my $kana ( keys %$kana_href ) {
-            my $gloss_index = $kana_href->{$kana};
+            my $entry_key = $kana_href->{$kana};
 
-            # Find gloss(es) in kana dictionary
-            $gloss_hashref->{$word}{$kana}
-                = $self->kana_dict->{$kana}->[$gloss_index];
+            # Find gloss(es) in kana dictionary. Ignore sense boundaries
+            # and POS tags.
+            my $senses = $self->kana_dict->{$kana}{$entry_key};
+
+            push @{ $gloss_hashref->{$word}{$kana} }, @{ $_->[1] }
+                for values %$senses;
         }
     }
-    elsif ( my $glosses = $self->kana_dict->{$word} ) {
+    elsif ( my $entries = $self->kana_dict->{$word} ) {
         # Word not found in kanji dictionary;
         # is written in kana alone.
         # So just get all glosses for that kana entry.
-        $gloss_hashref->{$word} = $glosses;
+        # Ignore entry and sense boundaries, and POS tags.
+        for my $senses ( values %$entries ) {
+            push @{ $gloss_hashref->{$word} }, @{ $_->[1] }
+                for values %$senses;
+        }
     }
     else {
         # Word cannot be found - perhaps it is a phrase that can be
@@ -195,28 +202,60 @@ sub _add_to_dictionary {
     my $dom = Mojo::DOM58->new($xml);
 
     # An entry should always have at least one kana reading ('reb'
-    # element) and one English definition ('gloss' element), so skip
+    # element) and one English definition (within 'sense' element), so skip
     # if either one is absent.
     # 'keb' = kanji reading
     my $kana_elems;
     return unless $kana_elems = $dom->find('reb');
 
-    my @gloss_texts;
-    return unless @gloss_texts = map $_->text, @{ $dom->find('gloss') };
-
     my $kanji_elems = $dom->find('keb');
 
-    # We also want the part-of-speech (POS) tags (whether the word is a
-    # noun, verb, etc.). May be more than one tag.
+    my @sense_nodes;
+    return unless @sense_nodes = @{ $dom->find('sense') };
 
-    # TODO What if no POS? Default to empty string?
-    my $pos_elems = $dom->find('pos');
-    $pos_elems = [ map _pos_mapping( $_->text ), @$pos_elems ];
+    # %sense_data is of form
+    # sense_1 =>  [
+    #       [
+    #           pos_1, pos_2, ...
+    #       ],
+    #       [
+    #           gloss_1, gloss_2, ...
+    #       ],
+    #   ],
+    #   sense_2 => [
+    #       ...
+    #   ],
+    # )
+    my %sense_data;
+
+    my $index = 1;
+    for my $sense_node (@sense_nodes) {
+        my @gloss_texts;
+        next
+            unless @gloss_texts = map $_->text,
+            @{ $sense_node->find('gloss') };
+
+        my @pos_texts = map _pos_mapping( $_->text ),
+            @{ $sense_node->find('pos') };
+
+        # If a sense node does not have its own POS tags, steal from its
+        # first sibling
+        @pos_texts = @{ $sense_data{sense_1}[0] } unless @pos_texts;
+
+        $sense_data{"sense_$index"} = [ \@pos_texts, \@gloss_texts ];
+
+        $index++;
+    }
 
     for my $kana (@$kana_elems) {
+        # TODO Update these comments!
+        # Am now using hashrefs as well as arrayrefs, for readability (though
+        # there is probably loss of efficiency).
+        #
         # Add to the kana_dict hashref.
-        # Each kana key points to an arrayref of arrayrefs, with each of
-        # these inner arrayrefs having an arrayref of POS tags as its first
+        # Each kana key points to an arrayref of entries.
+        # Each entry is an arrayref of senses.
+        # Each sense is an arrayref, with an arrayref of POS tags as its first
         # element and an arrayref of glosses as its second.
         #
         # This innermost arrayref of glosses is for a particular kanji
@@ -225,10 +264,18 @@ sub _add_to_dictionary {
         #
         # The index of each new arrayref is used in the kanji dictionary
         # below.
-        push @{ $self->kana_dict->{ $kana->text } },
-            [ $pos_elems, \@gloss_texts ];
 
-        my $gloss_index = @{ $self->kana_dict->{ $kana->text } } - 1;
+        my $entry_index = 1;
+        $entry_index++
+            while
+            exists $self->kana_dict->{ $kana->text }->{"entry_$entry_index"};
+
+        $self->kana_dict->{ $kana->text }->{"entry_$entry_index"}
+            = \%sense_data;
+
+        # push @{ $self->kana_dict->{ $kana->text } }, \%sense_data;
+
+        # my $entry_index = @{ $self->kana_dict->{ $kana->text } } - 1;
 
         for my $kanji (@$kanji_elems) {
             # Add to the kanji_dict hashref.
@@ -241,7 +288,7 @@ sub _add_to_dictionary {
             # to 'confidence').
             # A kanji entry may have more than one kana reading.
             $self->kanji_dict->{ $kanji->text }->{ $kana->text }
-                = $gloss_index;
+                = "entry_$entry_index";
         }
     }
 }

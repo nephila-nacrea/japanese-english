@@ -21,58 +21,79 @@ my $jed_2 = JEDictionary->new( xml_filename => $xml_filename );
 for ( $jed_1, $jed_2 ) {
     is $_->kana_dict,
         {
-        'か' =>
-            [ [ [qw/n-suf ctr/], [ 'day of month', 'counter for days' ] ] ],
-        'じしん' => [
-            [ [qw/n vs/], [ 'self-confidence', 'confidence (in oneself)' ] ],
-            [ ['n'], ['earthquake'] ],
-        ],
-        'じぶるい' => [ [ ['n'], ['earthquake'] ] ],
-        'とりうち' => [ [ ['n'], [ 'fowling', 'shooting birds' ] ] ],
-        'ない'       => [ [ ['n'], ['earthquake'] ] ],
-        'なえ'       => [ [ ['n'], ['earthquake'] ] ],
-        'にち' => [
-            [ ['n'],                ['Sunday'], ],
-            [ ['suf'],              ['day (of the month)'], ],
-            [ [qw/suf ctr/],        ['counter for days'], ],
-            [ [qw/n n-suf n-pref/], ['Japan'], ],
-        ],
-        'ひ' => [
-            [   ['n'],
-                [   'day', 'days', 'sun', 'sunshine', 'sunlight',
-                    'case (esp. unfortunate)', 'event',
-                ]
-            ],
-        ],
+        'か' => {
+            entry_1 => {
+                sense_1 => [ ['n-suf'], ['day of month'] ],
+                sense_2 => [ ['ctr'],   ['counter for days'] ],
+            },
+        },
+        'じしん' => {
+            entry_1 => {
+                sense_1 => [
+                    [qw/n vs/],
+                    [ 'self-confidence', 'confidence (in oneself)' ],
+                ],
+            },
+            entry_2 => { sense_1 => [ ['n'], ['earthquake'] ] },
+        },
+        'じぶるい' =>
+            { entry_1 => { sense_1 => [ ['n'], ['earthquake'] ] } },
+        'とりうち' => {
+            entry_1 =>
+                { sense_1 => [ ['n'], [ 'fowling', 'shooting birds' ] ] },
+        },
+        'ない' => { entry_1 => { sense_1 => [ ['n'], ['earthquake'] ] } },
+        'なえ' => { entry_1 => { sense_1 => [ ['n'], ['earthquake'] ] } },
+        'にち' => {
+            entry_1 => {
+                sense_1 => [ ['n'],                ['Sunday'] ],
+                sense_2 => [ ['suf'],              ['day (of the month)'] ],
+                sense_3 => [ [qw/suf ctr/],        ['counter for days'] ],
+                sense_4 => [ [qw/n n-suf n-pref/], ['Japan'] ],
+            },
+        },
+        'ひ' => {
+            entry_1 => {
+                sense_1 => [ [qw/n-adv n-t/], [ 'day', 'days' ] ],
+                sense_2 =>
+                    [ [qw/n-adv n-t/], [ 'sun', 'sunshine', 'sunlight' ] ],
+                sense_3 => [
+                    [qw/n-adv n-t/], [ 'case (esp. unfortunate)', 'event' ],
+                ],
+            },
+        },
         'スチューデントアパシー' =>
-            [ [ ['n'], ['student apathy'] ] ],
+            { entry_1 => { sense_1 => [ ['n'], ['student apathy'] ] } },
         'スチューデント・アパシー' =>
-            [ ['n'], [ ['student apathy'] ] ],
-        'とり' => [
-            [   ['n'],
-                [   'bird', 'bird meat (esp. chicken meat)', 'fowl',
-                    'poultry'
-                ]
-            ],
-        ],
+            { entry_1 => { sense_1 => [ ['n'], ['student apathy'] ] } },
+        'とり' => {
+            entry_1 => {
+                sense_1 => [ ['n'], ['bird'] ],
+                sense_2 => [
+                    ['n'],
+                    [ 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ],
+                ],
+            },
+        },
         },
         'build_dictionary_from_xml: kana_dict correct';
 
     is $_->kanji_dict,
         {
-        '鳥'    => { 'とり' => 0, },
-        '禽'    => { 'とり' => 0, },
+        '鳥'    => { 'とり' => 'entry_1', },
+        '禽'    => { 'とり' => 'entry_1', },
         '地震' => {
-            'じしん'    => 1,
-            'ない'       => 0,
-            'なえ'       => 0,
-            'じぶるい' => 0,
+            'じしん'    => 'entry_2',
+            'ない'       => 'entry_1',
+            'なえ'       => 'entry_1',
+            'じぶるい' => 'entry_1',
         },
-        '日'       => { 'か'          => 0, 'ひ' => 0, 'にち' => 0 },
-        '自信'    => { 'じしん'    => 0 },
-        '陽'       => { 'ひ'          => 0 },
-        '鳥打ち' => { 'とりうち' => 0 },
-        '鳥撃ち' => { 'とりうち' => 0 },
+        '日' =>
+            { 'か' => 'entry_1', 'ひ' => 'entry_1', 'にち' => 'entry_1' },
+        '自信'    => { 'じしん'    => 'entry_1' },
+        '陽'       => { 'ひ'          => 'entry_1' },
+        '鳥打ち' => { 'とりうち' => 'entry_1' },
+        '鳥撃ち' => { 'とりうち' => 'entry_1' },
         },
         'build_dictionary_from_xml: kanji_dict correct';
 }
@@ -84,7 +105,7 @@ is { $jed_2->get_english_definitions('鳥打ち') },
     'xml get_english_definitions: kanji word';
 
 is { $jed_2->get_english_definitions('とりうち') },
-    { 'とりうち' => [ [ 'fowling', 'shooting birds' ] ] },
+    { 'とりうち' => [ 'fowling', 'shooting birds' ] },
     'xml get_english_definitions: kana word';
 
 is { $jed_2->get_english_definitions('じしん') },
