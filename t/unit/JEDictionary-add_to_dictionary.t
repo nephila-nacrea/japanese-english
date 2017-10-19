@@ -29,15 +29,16 @@ $jed->_add_to_dictionary(
     <reb>としとる</reb>
     </r_ele>
     <sense>
-    <pos>&v5r;</pos>
-    <pos>&vi;</pos>
+    <pos>Godan verb with `ru\' ending</pos>
+    <pos>intransitive verb</pos>
     <gloss>to grow old</gloss>
     </sense>
     </entry>'
 );
 
 is $jed->kana_dict,
-    { 'としとる' => [ [ [qw/&v5r &vi/], ['to grow old'] ] ] },
+    { 'としとる' =>
+        { entry_1 => { sense_1 => [ [qw/v5r vi/], ['to grow old'] ] } } },
     'Add entry with no kanji: kana_dict';
 is $jed->kanji_dict, {}, 'Add entry with no kanji: kanji_dict';
 
@@ -50,8 +51,8 @@ $jed->_add_to_dictionary(
     <keb>年取る</keb>
     </k_ele>
     <sense>
-    <pos>&v5r;</pos>
-    <pos>&vi;</pos>
+    <pos>Godan verb with `ru\' ending</pos>
+    <pos>intransitive verb</pos>
     <gloss>to grow old</gloss>
     </sense>
     </entry>'
@@ -72,8 +73,8 @@ $jed->_add_to_dictionary(
     <reb>としとる</reb>
     </r_ele>
     <sense>
-    <pos>&v5r;</pos>
-    <pos>&vi;</pos>
+    <pos>Godan verb with `ru\' ending</pos>
+    <pos>intransitive verb</pos>
     </sense>
     </entry>'
 );
@@ -93,16 +94,18 @@ $jed->_add_to_dictionary(
     <reb>としとる</reb>
     </r_ele>
     <sense>
-    <pos>&v5r;</pos>
-    <pos>&vi;</pos>
+    <pos>Godan verb with `ru\' ending</pos>
+    <pos>intransitive verb</pos>
     <gloss>to grow old</gloss>
     </sense>
     </entry>'
 );
 
-is $jed->kana_dict, { 'としとる' => [ ['to grow old'] ] },
+is $jed->kana_dict,
+    { 'としとる' =>
+        { entry_1 => { sense_1 => [ [qw/v5r vi/], ['to grow old'] ] } } },
     'Add entry with one of each element: kana_dict';
-is $jed->kanji_dict, { '年取る' => { 'としとる' => 0 } },
+is $jed->kanji_dict, { '年取る' => { 'としとる' => 'entry_1' } },
     'Add entry with one of each element: kanji_dict';
 
 # Two of each (keb & reb)
@@ -123,8 +126,8 @@ $jed->_add_to_dictionary(
     <reb>トシトル</reb>
     </r_ele>
     <sense>
-    <pos>&v5r;</pos>
-    <pos>&vi;</pos>
+    <pos>Godan verb with `ru\' ending</pos>
+    <pos>intransitive verb</pos>
     <gloss>to grow old</gloss>
     <gloss>to age</gloss>
     </sense>

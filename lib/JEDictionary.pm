@@ -131,13 +131,7 @@ sub print_to_csv {
             }
         }
         elsif ( ref $gloss_hash{$key} eq 'ARRAY' ) {
-            # Kana entry is arrayref of arrayrefs:
-            #   <kana> => [
-            #       [<glosses_1], ...,
-            #   ],
-
-            # FIXME Why are there undefs instead of arrayrefs?
-            my @glosses = map @{ $_ // [] }, @{ $gloss_hash{$key} };
+            my @glosses = @{ $gloss_hash{$key} };
             $csv->print( $fh, [ $key, ( join "\t", @glosses ) ] );
         }
         else {
@@ -211,7 +205,10 @@ sub _add_to_dictionary {
     my $kanji_elems = $dom->find('keb');
 
     my @sense_nodes;
+
+    # If no sense nodes or gloss nodes, return
     return unless @sense_nodes = @{ $dom->find('sense') };
+    return unless @{ $dom->find('gloss') };
 
     # %sense_data is of form
     # sense_1 =>  [
@@ -272,10 +269,6 @@ sub _add_to_dictionary {
 
         $self->kana_dict->{ $kana->text }->{"entry_$entry_index"}
             = \%sense_data;
-
-        # push @{ $self->kana_dict->{ $kana->text } }, \%sense_data;
-
-        # my $entry_index = @{ $self->kana_dict->{ $kana->text } } - 1;
 
         for my $kanji (@$kanji_elems) {
             # Add to the kanji_dict hashref.

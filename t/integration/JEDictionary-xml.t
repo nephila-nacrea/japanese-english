@@ -110,20 +110,22 @@ is { $jed_2->get_english_definitions('とりうち') },
 
 is { $jed_2->get_english_definitions('じしん') },
     { 'じしん' =>
-        [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
-    },
+        _bag( 'self-confidence', 'confidence (in oneself)', 'earthquake' ) },
     'xml get_english_definitions: kana word with multiple gloss-groups';
 
 is { $jed_2->get_english_definitions('日') },
     {
     '日' => {
-        'か' => [ 'day of month', 'counter for days' ],
-        'にち' =>
-            [ 'Sunday', 'day (of the month)', 'counter for days', 'Japan' ],
-        'ひ' => [
+        'か'    => _bag( 'day of month', 'counter for days' ),
+        'にち' => _bag(
+            'Sunday',
+            'day (of the month)',
+            'counter for days', 'Japan'
+        ),
+        'ひ' => _bag(
             'day', 'days', 'sun', 'sunshine', 'sunlight',
             'case (esp. unfortunate)', 'event',
-        ],
+        ),
     },
     },
     'xml get_english_definitions: kanji word with multiple readings';
@@ -139,7 +141,7 @@ is { $jed_2->get_english_definitions('うちじしん') },
 is { $jed_2->get_english_definitions('とりうちじしん') },
     {
     'とり' =>
-        [ [ 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ] ],
+        _bag( 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ),
     'うち' => undef,
     'じし' => undef,
     'ん'    => undef,
@@ -154,18 +156,27 @@ is {
         )
 },
     {
-    'とりうち' => [ [ 'fowling', 'shooting birds' ] ],
-    '地震' => {
+    'とりうち' => _bag( 'fowling', 'shooting birds' ),
+    '地震'       => {
         'じしん'    => ['earthquake'],
         'じぶるい' => ['earthquake'],
         'ない'       => ['earthquake'],
         'なえ'       => ['earthquake'],
     },
     'じしん' =>
-        [ [ 'self-confidence', 'confidence (in oneself)' ], ['earthquake'] ],
-    'スチューデントアパシー'    => [ ['student apathy'] ],
-    'スチューデント・アパシー' => [ ['student apathy'] ],
+        _bag( 'self-confidence', 'confidence (in oneself)', 'earthquake' ),
+    'スチューデントアパシー'    => ['student apathy'],
+    'スチューデント・アパシー' => ['student apathy'],
     },
     'xml get_english_definitions: multiple inputs';
+
+sub _bag {
+    my @items = @_;
+
+    return bag {
+        item $_ for @items;
+        end();
+    };
+}
 
 done_testing;
