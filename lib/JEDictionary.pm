@@ -237,7 +237,7 @@ sub _add_to_dictionary {
 
         # If a sense node does not have its own POS tags, steal from its
         # first sibling
-        @pos_texts = @{ $sense_data{sense_1}[0] } unless @pos_texts;
+        @pos_texts = @{ $sense_data{sense_1}[0] // [] } unless @pos_texts;
 
         $sense_data{"sense_$index"} = [ \@pos_texts, \@gloss_texts ];
 

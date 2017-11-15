@@ -136,14 +136,22 @@ $jed->_add_to_dictionary(
 
 is $jed->kana_dict,
     {
-    'としとる' => [ [ 'to grow old', 'to age' ] ],
-    'トシトル' => [ [ 'to grow old', 'to age' ] ],
+    'としとる' => {
+        entry_1 =>
+            { sense_1 => [ [qw/v5r vi/], [ 'to grow old', 'to age' ] ] }
+    },
+    'トシトル' => {
+        entry_1 =>
+            { sense_1 => [ [qw/v5r vi/], [ 'to grow old', 'to age' ] ] }
+    },
     },
     'Add entry with two of each element: kana_dict';
 is $jed->kanji_dict,
     {
-    '年取る' => { 'としとる' => 0, 'トシトル' => 0, },
-    '歳取る' => { 'としとる' => 0, 'トシトル' => 0, },
+    '年取る' =>
+        { 'としとる' => 'entry_1', 'トシトル' => 'entry_1', },
+    '歳取る' =>
+        { 'としとる' => 'entry_1', 'トシトル' => 'entry_1', },
     },
     'Add entry with two of each element: kanji_dict';
 
@@ -179,12 +187,17 @@ $jed->_add_to_dictionary(
 );
 
 is $jed->kana_dict,
-    { 'じしん' => [ ['confidence'], ['earthquake'] ] },
+    {
+    'じしん' => {
+        entry_1 => { sense_1 => [ [], ['confidence'] ] },
+        entry_2 => { sense_1 => [ [], ['earthquake'] ] },
+    }
+    },
     'Kanji with same kana reading: kana_dict';
 is $jed->kanji_dict,
     {
-    '自信' => { 'じしん' => 0 },
-    '地震' => { 'じしん' => 1 },
+    '自信' => { 'じしん' => 'entry_1' },
+    '地震' => { 'じしん' => 'entry_2' },
     },
     'Kanji with same kana reading: kanji_dict';
 
@@ -260,24 +273,37 @@ $jed->_add_to_dictionary(
 
 is $jed->kana_dict,
     {
-    'か' => [ [ 'day of month', 'counter for days' ] ],
-    'にち' =>
-        [ [ 'Sunday', 'day (of the month)', 'counter for days', 'Japan' ] ],
-    'ひ' => [
-        [   'day', 'days', 'sun', 'sunshine', 'sunlight',
-            'case (esp. unfortunate)', 'event',
-        ]
-    ],
+    'か' => {
+        entry_1 => {
+            sense_1 => [ [], ['day of month'] ],
+            sense_2 => [ [], ['counter for days'] ],
+        }
+    },
+    'にち' => {
+        entry_1 => {
+            sense_1 => [ [], ['Sunday'] ],
+            sense_2 => [ [], ['day (of the month)'] ],
+            sense_3 => [ [], ['counter for days'] ],
+            sense_4 => [ [], ['Japan'] ],
+        }
+    },
+    'ひ' => {
+        entry_1 => {
+            sense_1 => [ [], [ 'day', 'days' ] ],
+            sense_2 => [ [], [ 'sun', 'sunshine', 'sunlight' ] ],
+            sense_3 => [ [], [ 'case (esp. unfortunate)', 'event' ] ],
+        }
+    },
     },
     'Identical kanji with different readings: kana_dict';
 is $jed->kanji_dict,
     {
     '日' => {
-        'か'    => 0,
-        'ひ'    => 0,
-        'にち' => 0,
+        'か'    => 'entry_1',
+        'ひ'    => 'entry_1',
+        'にち' => 'entry_1',
     },
-    '陽' => { 'ひ' => 0 },
+    '陽' => { 'ひ' => 'entry_1' },
     },
     'Identical kanji with different readings: kanji_dict';
 

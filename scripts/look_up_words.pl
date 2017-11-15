@@ -12,7 +12,8 @@ $jed->build_dictionary_from_binary(
     '../japanese-english/data/kanji-dict',
 );
 
-my @words = qw/脚本
+my @words = qw/
+    脚本
     工夫
     語学プログラム
     医療関係
