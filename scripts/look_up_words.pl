@@ -7,10 +7,6 @@ use utf8;
 use JEDictionary;
 
 my $jed = JEDictionary->new;
-$jed->build_dictionary_from_binary(
-    '../japanese-english/data/kana-dict',
-    '../japanese-english/data/kanji-dict',
-);
 
 my @words = qw/
     脚本
