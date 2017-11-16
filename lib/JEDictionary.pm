@@ -245,13 +245,12 @@ sub _add_to_dictionary {
     }
 
     for my $kana (@$kana_elems) {
-        # TODO Update these comments!
         # Am now using hashrefs as well as arrayrefs, for readability (though
         # there is probably loss of efficiency).
         #
         # Add to the kana_dict hashref.
-        # Each kana key points to an arrayref of entries.
-        # Each entry is an arrayref of senses.
+        # Each kana key points to a hashref of entries.
+        # Each entry is a hashref of senses.
         # Each sense is an arrayref, with an arrayref of POS tags as its first
         # element and an arrayref of glosses as its second.
         #
@@ -259,8 +258,8 @@ sub _add_to_dictionary {
         # reading (as a kana reading may map to multiple kanji readings,
         # e.g. 地震 and 自信 both map to じしん).
         #
-        # The index of each new arrayref is used in the kanji dictionary
-        # below.
+        # Entry keys (that point to hashrefs of senses) are used in the kanji
+        # dictionary below.
 
         my $entry_index = 1;
         $entry_index++
@@ -272,11 +271,10 @@ sub _add_to_dictionary {
 
         for my $kanji (@$kanji_elems) {
             # Add to the kanji_dict hashref.
-            # Each value is a hashref mapping a kana reading to its gloss
-            # index.
+            # Each value is a hashref mapping a kana reading to its entry key.
             # So e.g. if you were to look up 地震 in the kanji dictionary,
-            # you would get a kana reading of じしん and an index of X;
-            # the kana and index can be used to look up the correct English
+            # you would get a kana reading of じしん and a key of entry_*;
+            # the kana and key can be used to look up the correct English
             # gloss(es) in the kana dictionary (e.g. 'earthquake' as opposed
             # to 'confidence').
             # A kanji entry may have more than one kana reading.
