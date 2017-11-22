@@ -5,15 +5,19 @@ use utf8;
 use warnings;
 
 use JEDictionary;
+use JETranslator;
 use Test2::V0;
 
 # Test get_english_definitions
 # for phrases
 
-my $jed = JEDictionary->new(
-    xml_filename => '../japanese-english/t/data/test-dict.xml' );
+my $jet = JETranslator->new(
+    dictionary => JEDictionary->new(
+        xml_filename => '../japanese-english/t/data/test-dict.xml'
+    )
+);
 
-is { $jed->get_english_definitions('地震自信') },
+is { $jet->get_english_definitions('地震自信') },
     {
     '地震' => {
         'じしん'    => ['earthquake'],

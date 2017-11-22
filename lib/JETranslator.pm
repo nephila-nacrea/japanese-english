@@ -7,13 +7,14 @@ use warnings;
 
 use JEDictionary;
 use Moo;
+use Text::CSV;
 use Text::MeCab;
 use Unicode::UTF8 'decode_utf8';
 
-has dictionary => { is => 'rw', default => { JEDictionary->new } };
+has dictionary => ( is => 'rw', default => sub { JEDictionary->new } );
 
 sub translate {
-    my ($self, $sentence) = @_;
+    my ( $self, $sentence ) = @_;
 
     # TODO
 }
@@ -95,7 +96,7 @@ sub _add_definition_for_word {
     # Look in kanji dictionary first.
     # $kana_href is of the form
     # { <kana_reading> => <entry_key>, ... }
-    if ( my $kana_href = $self->kanji_dict->{$word} ) {
+    if ( my $kana_href = $self->dictionary->kanji_dict->{$word} ) {
         # There may be several kana readings for a kanji, which
         # may or may not share the same glosses.
         # Just get the glosses for each one, though there may be
@@ -105,13 +106,13 @@ sub _add_definition_for_word {
 
             # Find gloss(es) in kana dictionary. Ignore sense boundaries
             # and POS tags.
-            my $senses = $self->kana_dict->{$kana}{$entry_key};
+            my $senses = $self->dictionary->kana_dict->{$kana}{$entry_key};
 
             push @{ $gloss_hashref->{$word}{$kana} }, @{ $_->[1] }
                 for values %$senses;
         }
     }
-    elsif ( my $entries = $self->kana_dict->{$word} ) {
+    elsif ( my $entries = $self->dictionary->kana_dict->{$word} ) {
         # Word not found in kanji dictionary;
         # is written in kana alone.
         # So just get all glosses for that kana entry.
@@ -150,8 +151,10 @@ sub _tokenise {
         # those.
         # Text::MeCab evidently does some kind of encoding, as we have to
         # use decode_utf8 to avoid double-encoded strings.
-        push @words, decode_utf8 $surface_form if $surface_form;
+        push @words, $surface_form if $surface_form;
     }
 
     return @words;
 }
+
+1;

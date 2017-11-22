@@ -5,6 +5,7 @@ use utf8;
 use warnings;
 
 use JEDictionary;
+use JETranslator;
 use Test2::V0;
 
 # Test build_dictionary_from_binary.
@@ -108,21 +109,23 @@ for ( $jed_1, $jed_2 ) {
 
 # Test get_english_definitions
 
-is { $jed_2->get_english_definitions('鳥打ち') },
+my $jet = JETranslator->new( dictionary => $jed_2 );
+
+is { $jet->get_english_definitions('鳥打ち') },
     { '鳥打ち' =>
         { 'とりうち' => _bag( 'fowling', 'shooting birds' ) }, },
     'binary get_english_definitions: kanji word';
 
-is { $jed_2->get_english_definitions('とりうち') },
+is { $jet->get_english_definitions('とりうち') },
     { 'とりうち' => _bag( 'fowling', 'shooting birds' ) },
     'binary get_english_definitions: kana word';
 
-is { $jed_2->get_english_definitions('じしん') },
+is { $jet->get_english_definitions('じしん') },
     { 'じしん' =>
         _bag( 'self-confidence', 'confidence (in oneself)', 'earthquake' ), },
     'binary get_english_definitions: kana word with multiple gloss-groups';
 
-is { $jed_2->get_english_definitions('日') },
+is { $jet->get_english_definitions('日') },
     {
     '日' => {
         'か'    => _bag( 'day of month', 'counter for days' ),
@@ -139,7 +142,7 @@ is { $jed_2->get_english_definitions('日') },
     },
     'binary get_english_definitions: kanji word with multiple readings';
 
-is { $jed_2->get_english_definitions('うちじしん') },
+is { $jet->get_english_definitions('うちじしん') },
     {
     'うち' => undef,
     'じし' => undef,
@@ -147,7 +150,7 @@ is { $jed_2->get_english_definitions('うちじしん') },
     },
     'binary get_english_definitions: no matches found';
 
-is { $jed_2->get_english_definitions('とりうちじしん') },
+is { $jet->get_english_definitions('とりうちじしん') },
     {
     'とり' =>
         [ 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ],
@@ -158,7 +161,7 @@ is { $jed_2->get_english_definitions('とりうちじしん') },
     'binary get_english_definitions: match found via tokenisation';
 
 is {
-    $jed_2->get_english_definitions(
+    $jet->get_english_definitions(
         'とりうち', '地震', 'じしん',
         'スチューデントアパシー',
         'スチューデント・アパシー'

@@ -8,9 +8,7 @@ use Mojo::DOM58;
 use Moo;
 # FIXME Use OO interface for Sereal (see https://metacpan.org/pod/Sereal)
 use Sereal qw/decode_sereal encode_sereal/;
-use Text::CSV;
 use Text::MeCab;
-use Unicode::UTF8 'decode_utf8';
 use XML::LibXML::Reader;
 
 use constant {
