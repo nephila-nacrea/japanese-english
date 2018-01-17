@@ -5,11 +5,11 @@ use lib '../japanese-english/lib';
 use strict;
 use warnings;
 
+use Encode qw/decode encode/;
 use JEDictionary;
 use Moo;
 use Text::CSV;
 use Text::MeCab;
-use Unicode::UTF8 'decode_utf8';
 
 has dictionary => ( is => 'rw', default => sub { JEDictionary->new } );
 
@@ -144,13 +144,15 @@ sub _tokenise {
     my $mecab = Text::MeCab->new;
 
     my @words;
+
+    $phrase = encode( 'euc-jp', $phrase );
+
     for ( my $node = $mecab->parse($phrase); $node; $node = $node->next ) {
-        my $surface_form = $node->surface;
+
+        my $surface_form = decode( 'euc-jp', $node->surface );
 
         # First and last elements are empty so we do not want to include
-        # those.
-        # Text::MeCab evidently does some kind of encoding, as we have to
-        # use decode_utf8 to avoid double-encoded strings.
+        # those
         push @words, $surface_form if $surface_form;
     }
 
