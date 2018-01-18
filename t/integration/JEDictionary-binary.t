@@ -142,23 +142,32 @@ is { $jet->get_english_definitions('日') },
     },
     'binary get_english_definitions: kanji word with multiple readings';
 
-is { $jet->get_english_definitions('うちじしん') },
+is { $jet->get_english_definitions('私の名前はうちじし') },
     {
     'うち' => undef,
     'じし' => undef,
-    'ん'    => undef,
+    'の'    => undef,
+    'は'    => undef,
+    '名前' => undef,
+    '私'    => undef,
     },
     'binary get_english_definitions: no matches found';
 
-is { $jet->get_english_definitions('とりうちじしん') },
+is {
+    $jet->get_english_definitions(
+        'わたしのなまえはとりうちじし')
+},
     {
-    'とり' =>
-        [ 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ],
     'うち' => undef,
     'じし' => undef,
-    'ん'    => undef,
+    'とり' =>
+        _bag( 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ),
+    'なまえ' => undef,
+    'の'       => undef,
+    'は'       => undef,
+    'わたし' => undef,
     },
-    'binary get_english_definitions: match found via tokenisation';
+    'binary get_english_definitions: match found from tokenisation';
 
 is {
     $jet->get_english_definitions(
