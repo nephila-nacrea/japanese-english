@@ -145,11 +145,15 @@ sub _tokenise {
 
     my @words;
 
-    $phrase = encode( 'euc-jp', $phrase );
+    # Have to encode/decode using euc-jp on work computer...
+
+    # $phrase = encode( 'euc-jp', $phrase );
+    $phrase = encode( 'utf-8', $phrase );
 
     for ( my $node = $mecab->parse($phrase); $node; $node = $node->next ) {
 
-        my $surface_form = decode( 'euc-jp', $node->surface );
+        # my $surface_form = decode( 'euc-jp', $node->surface );
+        my $surface_form = decode( 'utf-8', $node->surface );
 
         # First and last elements are empty so we do not want to include
         # those

@@ -1,0 +1,75 @@
+# Work computer
+mecab -P
+
+bos-feature: BOS/EOS,*,*,*,*,*,*
+bos-format:
+cost-factor: 700
+dicdir: /var/lib/mecab/dic/debian
+dump-config: 1
+eon-format:
+eos-format: EOS\n
+eos-format-simple: EOS\n
+eos-format-yomi: \n
+eval-size: 4
+lattice-level: 0
+max-grouping-size: 24
+nbest: 1
+node-format: %m\t%H\n
+node-format-simple: %m\t%F-[0,1,2,3]\n
+node-format-yomi: %pS%f[5]
+theta: 0.75
+unk-eval-size: 2
+unk-format: %m\t%H\n
+unk-format-yomi: %M
+
+mecab -D
+
+filename:       /var/lib/mecab/dic/debian/sys.dic
+version:        102
+charset:        EUC-JP
+type:   0
+size:   516002
+left size:      1509
+right size:     1509
+
+# Home computer
+mecab -P
+
+bos-feature: BOS/EOS,*,*,*,*,*,*,*,*
+bos-format: 
+config-charset: UTF-8
+cost-factor: 700
+dicdir: /usr/lib/mecab/dic/ipadic
+dump-config: 1
+eon-format: 
+eos-format: EOS\n
+eos-format-chasen: EOS\n
+eos-format-chasen2: EOS\n
+eos-format-simple: EOS\n
+eos-format-yomi: \n
+eval-size: 8
+lattice-level: 0
+max-grouping-size: 24
+nbest: 1
+node-format: %m\t%H\n
+node-format-chasen: %m\t%f[7]\t%f[6]\t%F-[0,1,2,3]\t%f[4]\t%f[5]\n
+node-format-chasen2: %M\t%f[7]\t%f[6]\t%F-[0,1,2,3]\t%f[4]\t%f[5]\n
+node-format-simple: %m\t%F-[0,1,2,3]\n
+node-format-yomi: %pS%f[7]
+theta: 0.75
+unk-eval-size: 4
+unk-format: %m\t%H\n
+unk-format-chasen: %m\t%m\t%m\t%F-[0,1,2,3]\t\t\n
+unk-format-chasen2: %M\t%m\t%m\t%F-[0,1,2,3]\t\t\n
+unk-format-yomi: %M
+
+mecab -D
+
+filename:	/usr/lib/mecab/dic/ipadic/sys.dic
+version:	102
+charset:	utf-8
+type:	0
+size:	392126
+left size:	1316
+right size:	1316
+

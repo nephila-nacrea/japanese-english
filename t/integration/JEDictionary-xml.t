@@ -153,7 +153,9 @@ is {
     'じし' => undef,
     'とり' =>
         _bag( 'bird', 'bird meat (esp. chicken meat)', 'fowl', 'poultry' ),
-    'なまえ' => undef,
+    'え'       => undef,
+    'な'       => undef,
+    'ま'       => undef,
     'の'       => undef,
     'は'       => undef,
     'わたし' => undef,
