@@ -14,9 +14,16 @@ use Text::MeCab;
 has dictionary => ( is => 'rw', default => sub { JEDictionary->new } );
 
 sub translate {
-    my ( $self, $sentence ) = @_;
+    my ( $self, $jp_sentence ) = @_;
 
-    # TODO
+    my @japanese_words = _tokenise($jp_sentence);
+
+    my $eng_sentence = '';
+    for (@japanese_words) {
+        $eng_sentence .= $self->get_first_english_definition($_) . ' ';
+    }
+
+    return $eng_sentence;
 }
 
 # Get hash of definitions, given a list of Japanese words
@@ -44,6 +51,35 @@ sub get_english_definitions {
     # }
 
     return %gloss_hash;
+}
+
+sub get_first_english_definition {
+    my ( $self, $jp_word ) = @_;
+
+    # TODO Get rid of code repetition here and in _add_definition_for_word
+
+    # Look in kanji dictionary first.
+    # $kana_href is of the form
+    # { <kana_reading> => <entry_key>, ... }
+    if ( my $kana_href = $self->dictionary->kanji_dict->{$jp_word} ) {
+        # There may be several kana readings for a kanji, which
+        # may or may not share the same glosses.
+        # Just get the first kana reading.
+        my $kana = (sort keys %$kana_href)[0];
+
+        # Just get first gloss for kana entry.
+        my $entries = $self->dictionary->kana_dict->{$kana};
+        return $entries->{entry_1}{sense_1}[1][0];
+    }
+    elsif ( my $entries = $self->dictionary->kana_dict->{$jp_word} ) {
+        # Word not found in kanji dictionary;
+        # is written in kana alone.
+        # Just get first gloss for kana entry.
+        return $entries->{entry_1}{sense_1}[1][0];
+    }
+    else {
+        return 'UNKNOWN';
+    }
 }
 
 # Prints list of Japanese words with English glosses to a .csv file.
